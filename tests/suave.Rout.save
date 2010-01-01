@@ -1,0 +1,163 @@
+
+R version 2.8.1 (2008-12-22)
+Copyright (C) 2008 The R Foundation for Statistical Computing
+ISBN 3-900051-07-0
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> #dyn.load("../src/cuba.so");source("../R/suave.R"); source("../R/commoncuba.R")
+> library("R2Cuba")
+> integrand <- function(arg, weight) {
++   x <- arg[1]
++   y <- arg[2]
++   z <- arg[3]
++  #  print( weight)
++   ff <- sin(x)*cos(y)*exp(z);
++ return(ff)
++ } # end  integrand
+> 
+> NDIM <- 3
+> NCOMP <- 1
+> EPSREL <- 1e-3
+> EPSABS <- 1e-12
+> VERBOSE <- 2
+> LAST <- 1
+> 
+> suave(NDIM, NCOMP, integrand,
++                   rel.tol=EPSREL,  abs.tol=EPSABS,
++       flags=list(verbose=0))
+
+integral: 0.6647464 (+-0.00061)
+nregions: 6; number of evaluations:  6000; probability:  0.001946077 
+> # ----------------------------------------
+> # Essai avec ...
+> integrandp <- function(arg, weight, ...) {
++ 
++   x <- arg[1]
++   y <- arg[2]
++   z <- arg[3]
++  # print( weight, ...)
++     ff <- sin(x)*cos(y)*exp(z);
++ return(ff)
++ } # fin integrandp
+> suave(NDIM, NCOMP, integrandp, digits=1,
++                   rel.tol=EPSREL,  abs.tol=EPSABS,
++              flags=list(verbose=0))
+
+integral: 0.6647464 (+-0.00061)
+nregions: 6; number of evaluations:  6000; probability:  0.001946077 
+> # ----------------------------------------
+> 
+> # Essai en déplacant les bornes
+> integrand2 <- function(arg, weight) {
++   x <- arg[1]
++   y <- arg[2]
++   z <- arg[3]
++    ff <- sin(x-3)*cos(y-2)*exp(z-1);
++ return(ff)
++ } # End integrand2
+> suave(NDIM, NCOMP,  integrand2, lower=c(3,2,1), upper=c(4,3,2), flags=list(verbose=3))
+Suave input parameters:
+  ndim 3
+  ncomp 1
+  rel.tol 0.001
+  abs.tol 4.93038e-32
+  smooth 0
+  pseudo.random  0
+  final 0
+  verbose 3
+  min.eval 0
+  max.eval 50000
+  nnew 1000
+  flatness 50
+Region (3.000000) - (4.000000)
+       (2.000000) - (3.000000)
+       (1.000000) - (2.000000)
+[1] 0.664916 +- 0.0138647 (1000)  	chisq 0 (0 df)
+Iteration 1:  1000 integrand evaluations so far
+[1] 0.664916 +- 0.0138647  	chisq 0 (0 df)
+Region (3.000000) - (4.000000)
+       (2.000000) - (3.000000)
+       (1.000000) - (1.500000)
+[1] 0.250709 +- 0.00663491 (499)
+    0.250973 +- 0.00256335 (485)  	chisq 0.00137903 (1 df)
+Region (3.000000) - (4.000000)
+       (2.000000) - (3.000000)
+       (1.500000) - (2.000000)
+[1] 0.414207 +- 0.0110476 (501)
+    0.413296 +- 0.00404138 (515)  	chisq 0.00599389 (1 df)
+Iteration 2:  2000 integrand evaluations so far
+[1] 0.664343 +- 0.0046336  	chisq 0.00737292 (2 df)
+Region (3.000000) - (3.500000)
+       (2.000000) - (3.000000)
+       (1.500000) - (2.000000)
+[1] 0.110116 +- 0.00434641 (251)
+    0.110813 +- 0.00239641 (178)
+    0.109819 +- 0.000915187 (385)  	chisq 0.151524 (2 df)
+Region (3.500000) - (4.000000)
+       (2.000000) - (3.000000)
+       (1.500000) - (2.000000)
+[1] 0.30409 +- 0.00523033 (250)
+    0.302483 +- 0.00133615 (337)
+    0.303827 +- 0.000372867 (615)  	chisq 0.944047 (2 df)
+Iteration 3:  3000 integrand evaluations so far
+[1] 0.664623 +- 0.0026616  	chisq 1.09695 (5 df)
+Region (3.000000) - (3.500000)
+       (2.000000) - (3.000000)
+       (1.000000) - (1.500000)
+[1] 0.0670237 +- 0.00262764 (249)
+    0.0661797 +- 0.00151146 (165)
+    0.06651 +- 0.000567663 (379)  	chisq 0.0846342 (2 df)
+Region (3.500000) - (4.000000)
+       (2.000000) - (3.000000)
+       (1.000000) - (1.500000)
+[1] 0.183686 +- 0.00317127 (250)
+    0.184794 +- 0.000949804 (320)
+    0.184173 +- 0.000276309 (621)  	chisq 0.422141 (2 df)
+Iteration 4:  4000 integrand evaluations so far
+[1] 0.664393 +- 0.00118042  	chisq 1.60235 (8 df)
+Region (3.000000) - (3.250000)
+       (2.000000) - (3.000000)
+       (1.500000) - (2.000000)
+[1] 0.0281465 +- 0.00157492 (126)
+    0.0289662 +- 0.00125883 (66)
+    0.0276567 +- 0.000661213 (116)
+    0.0278237 +- 0.00027535 (295)  	chisq 0.916106 (3 df)
+Region (3.250000) - (3.500000)
+       (2.000000) - (3.000000)
+       (1.500000) - (2.000000)
+[1] 0.0819698 +- 0.00215915 (125)
+    0.0818469 +- 0.000785543 (112)
+    0.0821627 +- 0.000195137 (269)
+    0.0821404 +- 7.56023e-05 (705)  	chisq 0.158888 (3 df)
+Iteration 5:  5000 integrand evaluations so far
+[1] 0.664433 +- 0.000802054  	chisq 2.52582 (12 df)
+Region (3.000000) - (3.250000)
+       (2.000000) - (3.000000)
+       (1.000000) - (1.500000)
+[1] 0.0169736 +- 0.000955442 (124)
+    0.0168176 +- 0.000790091 (60)
+    0.016796 +- 0.000418504 (114)
+    0.0170033 +- 0.000151059 (328)  	chisq 0.257663 (3 df)
+Region (3.250000) - (3.500000)
+       (2.000000) - (3.000000)
+       (1.000000) - (1.500000)
+[1] 0.05005 +- 0.00128916 (125)
+    0.049362 +- 0.000532697 (105)
+    0.049714 +- 0.000136418 (265)
+    0.0498517 +- 5.32669e-05 (672)  	chisq 1.6896 (3 df)
+Iteration 6:  6000 integrand evaluations so far
+[1] 0.664746 +- 0.000612748  	chisq 4.38844 (16 df)
+integral: 0.6647464 (+-0.00061)
+nregions: 6; number of evaluations:  6000; probability:  0.001946077 
+> 

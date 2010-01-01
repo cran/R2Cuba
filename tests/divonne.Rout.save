@@ -1,0 +1,578 @@
+
+R version 2.8.1 (2008-12-22)
+Copyright (C) 2008 The R Foundation for Statistical Computing
+ISBN 3-900051-07-0
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> #dyn.load("../src/cuba.so");source("../R/divonne.R");source("../R/commoncuba.R")
+> library("R2Cuba")
+> # DEMO EXAMPLES
+> # +++++++++++++++++++++++++++++++
+> integrand <- function(arg, phase) {
++   x <- arg[1]
++   y <- arg[2]
++   z <- arg[3]
++ # cat("PHASE", phase)
++   ff <- sin(x)*cos(y)*exp(z);
++ return(ff)
++ } # fin integrand
+> 
+> NDIM <- 3
+> NCOMP <- 1
+> NMAX <- 4
+> divonne(NDIM, NCOMP,  integrand, flags=list(verbose=3))
+Divonne input parameters:
+  ndim 3
+  ncomp 1
+  rel.tol 0.001
+  abs.tol 4.93038e-32
+  pseudo.random  0
+  final 0
+  verbose 3
+  min.eval 0
+  max.eval 50000
+  key1 47
+  key2 1
+  key3 1
+  max.pass 5
+  border 0
+  max.chisq 10
+  min.deviation 0.25
+  ngiven 0
+  nextra 0
+Partitioning phase:
+Iteration 1 (pass 0):  8 regions
+    836 integrand evaluations so far,
+    406 in optimizing regions,
+     70 in finding cuts
+[1] 0.665011 +- 0.00470198
+Iteration 2 (pass 0):  9 regions
+    966 integrand evaluations so far,
+    478 in optimizing regions,
+     80 in finding cuts
+[1] 0.664964 +- 0.00429467
+Iteration 3 (pass 1):  10 regions
+   1096 integrand evaluations so far,
+    550 in optimizing regions,
+     90 in finding cuts
+[1] 0.664949 +- 0.00388393
+Iteration 4 (pass 2):  11 regions
+   1194 integrand evaluations so far,
+    590 in optimizing regions,
+    100 in finding cuts
+[1] 0.664887 +- 0.0035842
+Iteration 5 (pass 3):  12 regions
+   1308 integrand evaluations so far,
+    646 in optimizing regions,
+    110 in finding cuts
+[1] 0.664853 +- 0.0033385
+Iteration 6 (pass 4):  13 regions
+   1438 integrand evaluations so far,
+    718 in optimizing regions,
+    120 in finding cuts
+[1] 0.664825 +- 0.0031276
+Iteration 7 (pass 5):  14 regions
+   1568 integrand evaluations so far,
+    790 in optimizing regions,
+    130 in finding cuts
+[1] 0.664816 +- 0.00292074
+Main integration on 14 regions with 211 samples per region.
+Region (0.500000) - (1.000000)
+       (0.500000) - (1.000000)
+       (0.750000) - (1.000000)
+[1] 0.0734093 +- 0.000973987(0)
+    0.0734148 +- 0.000216954(0)  	chisq 3.01079e-05
+Region (0.500000) - (1.000000)
+       (0.500000) - (1.000000)
+       (0.250000) - (0.500000)
+[1] 0.044525 +- 0.000590753(0)
+    0.0445283 +- 0.000131589(0)  	chisq 3.01079e-05
+Region (0.500000) - (1.000000)
+       (0.000000) - (0.500000)
+       (0.250000) - (0.500000)
+[1] 0.0589836 +- 0.000570564(0)
+    0.0589702 +- 0.000127093(0)  	chisq 0.000521926
+Region (0.000000) - (0.500000)
+       (0.000000) - (0.500000)
+       (0.000000) - (0.500000)
+[1] 0.0381429 +- 0.00113948(0)
+    0.0380717 +- 0.000253818(0)  	chisq 0.00371754
+Region (0.000000) - (0.500000)
+       (0.500000) - (1.000000)
+       (0.000000) - (0.500000)
+[1] 0.0287671 +- 0.000993733(0)
+    0.028742 +- 0.000221353(0)  	chisq 0.00060887
+Region (0.500000) - (1.000000)
+       (0.000000) - (0.500000)
+       (0.750000) - (1.000000)
+[1] 0.0972475 +- 0.000940702(0)
+    0.0972254 +- 0.00020954(0)  	chisq 0.000521926
+Region (0.000000) - (0.500000)
+       (0.000000) - (0.500000)
+       (0.750000) - (1.000000)
+[1] 0.0353188 +- 0.000882485(0)
+    0.0352871 +- 0.000196572(0)  	chisq 0.00122497
+Region (0.000000) - (0.500000)
+       (0.500000) - (1.000000)
+       (0.750000) - (1.000000)
+[1] 0.0266444 +- 0.000769162(0)
+    0.026641 +- 0.00017133(0)  	chisq 1.87223e-05
+Region (0.500000) - (1.000000)
+       (0.000000) - (0.500000)
+       (0.500000) - (0.750000)
+[1] 0.0757364 +- 0.000735203(0)
+    0.0757192 +- 0.000163766(0)  	chisq 0.000518264
+Region (0.500000) - (1.000000)
+       (0.500000) - (1.000000)
+       (0.500000) - (0.750000)
+[1] 0.0571712 +- 0.000759382(0)
+    0.0571755 +- 0.000169152(0)  	chisq 3.00413e-05
+Region (0.000000) - (0.500000)
+       (0.000000) - (0.500000)
+       (0.500000) - (0.750000)
+[1] 0.0275063 +- 0.000690701(0)
+    0.0274817 +- 0.000153853(0)  	chisq 0.00121287
+Region (0.000000) - (0.500000)
+       (0.500000) - (1.000000)
+       (0.500000) - (0.750000)
+[1] 0.0207507 +- 0.000600894(0)
+    0.0207481 +- 0.000133848(0)  	chisq 1.86059e-05
+Region (0.500000) - (1.000000)
+       (0.000000) - (0.500000)
+       (0.000000) - (0.250000)
+[1] 0.0459364 +- 0.000445923(0)
+    0.045926 +- 9.93288e-05(0)  	chisq 0.000518264
+Region (0.500000) - (1.000000)
+       (0.500000) - (1.000000)
+       (0.000000) - (0.250000)
+[1] 0.0346761 +- 0.000460589(0)
+    0.0346787 +- 0.000102596(0)  	chisq 3.00413e-05
+Totals:
+[1] 0.66462 +- 0.000635028  	chisq 0.00900226 (14 df)
+integral: 0.6646195 (+-0.00064)
+nregions: 14; number of evaluations:  3052; probability:  1.110223e-16 
+> # ------------------------------------------------------------
+> # Essai avec des arguments ...
+> integrandp <- function(arg, phase, ...) {
++   x <- arg[1]
++   y <- arg[2]
++   z <- arg[3]
++ #print("i", ...)
++   ff <- sin(x)*cos(y)*exp(z);
++ return(ff)
++ } # fin integrandp
+> divonne(NDIM, NCOMP,  integrandp, quote=FALSE, flags=list(verbose=0))
+
+integral: 0.6646195 (+-0.00064)
+nregions: 14; number of evaluations:  3052; probability:  1.110223e-16 
+> 
+> 
+> # ------------------------------------------------------------
+> # Essai en déplacant les bornes
+> integrand2 <- function(arg,phase, a) {
++   x <- arg[1]
++   y <- arg[2]
++   z <- arg[3]
++   ff <- sin(x-3)*cos(y-2)*exp(z-1);
++ return(ff)
++ } # End integrand2
+> divonne(NDIM, NCOMP,  integrand2, lower=c(3,2,1), upper=c(4,3,2), flags=list(verbose=3))
+Divonne input parameters:
+  ndim 3
+  ncomp 1
+  rel.tol 0.001
+  abs.tol 4.93038e-32
+  pseudo.random  0
+  final 0
+  verbose 3
+  min.eval 0
+  max.eval 50000
+  key1 47
+  key2 1
+  key3 1
+  max.pass 5
+  border 0
+  max.chisq 10
+  min.deviation 0.25
+  ngiven 0
+  nextra 0
+Partitioning phase:
+Iteration 1 (pass 0):  8 regions
+    836 integrand evaluations so far,
+    406 in optimizing regions,
+     70 in finding cuts
+[1] 0.665011 +- 0.00470198
+Iteration 2 (pass 0):  9 regions
+    966 integrand evaluations so far,
+    478 in optimizing regions,
+     80 in finding cuts
+[1] 0.664964 +- 0.00429467
+Iteration 3 (pass 1):  10 regions
+   1096 integrand evaluations so far,
+    550 in optimizing regions,
+     90 in finding cuts
+[1] 0.664949 +- 0.00388393
+Iteration 4 (pass 2):  11 regions
+   1194 integrand evaluations so far,
+    590 in optimizing regions,
+    100 in finding cuts
+[1] 0.664887 +- 0.0035842
+Iteration 5 (pass 3):  12 regions
+   1308 integrand evaluations so far,
+    646 in optimizing regions,
+    110 in finding cuts
+[1] 0.664853 +- 0.0033385
+Iteration 6 (pass 4):  13 regions
+   1438 integrand evaluations so far,
+    718 in optimizing regions,
+    120 in finding cuts
+[1] 0.664825 +- 0.0031276
+Iteration 7 (pass 5):  14 regions
+   1568 integrand evaluations so far,
+    790 in optimizing regions,
+    130 in finding cuts
+[1] 0.664816 +- 0.00292074
+Main integration on 14 regions with 211 samples per region.
+Region (3.500000) - (4.000000)
+       (2.500000) - (3.000000)
+       (1.750000) - (2.000000)
+[1] 0.0734093 +- 0.000973987(0)
+    0.0734148 +- 0.000216954(0)  	chisq 3.01079e-05
+Region (3.500000) - (4.000000)
+       (2.500000) - (3.000000)
+       (1.250000) - (1.500000)
+[1] 0.044525 +- 0.000590753(0)
+    0.0445283 +- 0.000131589(0)  	chisq 3.01079e-05
+Region (3.500000) - (4.000000)
+       (2.000000) - (2.500000)
+       (1.250000) - (1.500000)
+[1] 0.0589836 +- 0.000570564(0)
+    0.0589702 +- 0.000127093(0)  	chisq 0.000521926
+Region (3.000000) - (3.500000)
+       (2.000000) - (2.500000)
+       (1.000000) - (1.500000)
+[1] 0.0381429 +- 0.00113948(0)
+    0.0380717 +- 0.000253818(0)  	chisq 0.00371754
+Region (3.000000) - (3.500000)
+       (2.500000) - (3.000000)
+       (1.000000) - (1.500000)
+[1] 0.0287671 +- 0.000993733(0)
+    0.028742 +- 0.000221353(0)  	chisq 0.00060887
+Region (3.500000) - (4.000000)
+       (2.000000) - (2.500000)
+       (1.750000) - (2.000000)
+[1] 0.0972475 +- 0.000940702(0)
+    0.0972254 +- 0.00020954(0)  	chisq 0.000521926
+Region (3.000000) - (3.500000)
+       (2.000000) - (2.500000)
+       (1.750000) - (2.000000)
+[1] 0.0353188 +- 0.000882485(0)
+    0.0352871 +- 0.000196572(0)  	chisq 0.00122497
+Region (3.000000) - (3.500000)
+       (2.500000) - (3.000000)
+       (1.750000) - (2.000000)
+[1] 0.0266444 +- 0.000769162(0)
+    0.026641 +- 0.00017133(0)  	chisq 1.87223e-05
+Region (3.500000) - (4.000000)
+       (2.000000) - (2.500000)
+       (1.500000) - (1.750000)
+[1] 0.0757364 +- 0.000735203(0)
+    0.0757192 +- 0.000163766(0)  	chisq 0.000518264
+Region (3.500000) - (4.000000)
+       (2.500000) - (3.000000)
+       (1.500000) - (1.750000)
+[1] 0.0571712 +- 0.000759382(0)
+    0.0571755 +- 0.000169152(0)  	chisq 3.00413e-05
+Region (3.000000) - (3.500000)
+       (2.000000) - (2.500000)
+       (1.500000) - (1.750000)
+[1] 0.0275063 +- 0.000690701(0)
+    0.0274817 +- 0.000153853(0)  	chisq 0.00121287
+Region (3.000000) - (3.500000)
+       (2.500000) - (3.000000)
+       (1.500000) - (1.750000)
+[1] 0.0207507 +- 0.000600894(0)
+    0.0207481 +- 0.000133848(0)  	chisq 1.86059e-05
+Region (3.500000) - (4.000000)
+       (2.000000) - (2.500000)
+       (1.000000) - (1.250000)
+[1] 0.0459364 +- 0.000445923(0)
+    0.045926 +- 9.93288e-05(0)  	chisq 0.000518264
+Region (3.500000) - (4.000000)
+       (2.500000) - (3.000000)
+       (1.000000) - (1.250000)
+[1] 0.0346761 +- 0.000460589(0)
+    0.0346787 +- 0.000102596(0)  	chisq 3.00413e-05
+Totals:
+[1] 0.66462 +- 0.000635028  	chisq 0.00900226 (14 df)
+integral: 0.6646195 (+-0.00064)
+nregions: 14; number of evaluations:  3052; probability:  1.110223e-16 
+> # ------------------------------------------------------------
+> # Essai avec mersenne.seed
+> EPSREL <- 1e-3
+> EPSABS <- 1e-12
+> divonne(NDIM, NCOMP, integrand,
++   rel.tol=EPSREL,  abs.tol=EPSABS,
++       flags=list(verbose=0, pseudo.random=1, mersenne.seed=10))
+
+integral: 0.6646195 (+-0.00064)
+nregions: 14; number of evaluations:  3052; probability:  1.110223e-16 
+> # ---------------------------------------------------------------
+> # Essai d'intégrande a pls composantes
+> integrand3 <- function(arg, phase,a) {
++   x <- arg[1]
++   y <- arg[2]
++   z <- arg[3]
++   ff <- sin(x)*cos(y)*exp(z);
++   gg <-  1/(3.75 - cos(pi*x) - cos(pi*y) - cos(pi*z));
++ return(c(ff,gg))
++ } # End integrand3
+> divonne(NDIM,2, integrand3,  flags=list(verbose=3))
+Divonne input parameters:
+  ndim 3
+  ncomp 2
+  rel.tol 0.001
+  abs.tol 4.93038e-32
+  pseudo.random  0
+  final 0
+  verbose 3
+  min.eval 0
+  max.eval 50000
+  key1 47
+  key2 1
+  key3 1
+  max.pass 5
+  border 0
+  max.chisq 10
+  min.deviation 0.25
+  ngiven 0
+  nextra 0
+Partitioning phase:
+Iteration 1 (pass 0):  8 regions
+   1214 integrand evaluations so far,
+    790 in optimizing regions,
+     64 in finding cuts
+[1] 0.66501 +- 0.00489722
+[2] 0.307908 +- 0.00230089
+Iteration 2 (pass 0):  9 regions
+   1382 integrand evaluations so far,
+    900 in optimizing regions,
+     74 in finding cuts
+[1] 0.664956 +- 0.00433088
+[2] 0.307901 +- 0.00222825
+Iteration 3 (pass 1):  10 regions
+   1556 integrand evaluations so far,
+   1016 in optimizing regions,
+     84 in finding cuts
+[1] 0.664934 +- 0.00374206
+[2] 0.307901 +- 0.00217992
+Iteration 4 (pass 2):  11 regions
+   1718 integrand evaluations so far,
+   1126 in optimizing regions,
+     88 in finding cuts
+[1] 0.664901 +- 0.00346076
+[2] 0.30789 +- 0.00199914
+Iteration 5 (pass 3):  12 regions
+   1892 integrand evaluations so far,
+   1242 in optimizing regions,
+     98 in finding cuts
+[1] 0.664888 +- 0.00318212
+[2] 0.307893 +- 0.00191138
+Iteration 6 (pass 4):  13 regions
+   2034 integrand evaluations so far,
+   1326 in optimizing regions,
+    108 in finding cuts
+[1] 0.66484 +- 0.00297658
+[2] 0.307884 +- 0.00179803
+Iteration 7 (pass 5):  14 regions
+   2192 integrand evaluations so far,
+   1426 in optimizing regions,
+    118 in finding cuts
+[1] 0.664814 +- 0.00280222
+[2] 0.307882 +- 0.00173398
+Main integration on 14 regions with 269 samples per region.
+Region (0.718750) - (1.000000)
+       (0.500000) - (1.000000)
+       (0.500000) - (1.000000)
+[1] 0.0822022 +- 0.00106844(0)
+    0.0822133 +- 0.000186679(0)  	chisq 0.000103963
+[2] 0.0119927 +- 5.98026e-05(0)
+    0.0119932 +- 1.04488e-05(0)  	chisq 6.88573e-05
+Region (0.000000) - (0.437500)
+       (0.500000) - (1.000000)
+       (0.750000) - (1.000000)
+[1] 0.0204998 +- 0.000594755(0)
+    0.0204995 +- 0.000103916(0)  	chisq 1.9583e-07
+[2] 0.0120539 +- 6.40207e-05(0)
+    0.0120539 +- 1.11858e-05(0)  	chisq 1.18796e-06
+Region (0.000000) - (0.437500)
+       (0.500000) - (1.000000)
+       (0.000000) - (0.500000)
+[1] 0.022133 +- 0.000776155(0)
+    0.0221161 +- 0.000135611(0)  	chisq 0.00045886
+[2] 0.0370844 +- 0.000688023(0)
+    0.037063 +- 0.000120212(0)  	chisq 0.000933499
+Region (0.000000) - (0.437500)
+       (0.000000) - (0.500000)
+       (0.000000) - (0.500000)
+[1] 0.029347 +- 0.000875789(0)
+    0.029292 +- 0.000153019(0)  	chisq 0.00383241
+[2] 0.0677083 +- 0.00150616(0)
+    0.0676926 +- 0.000263158(0)  	chisq 0.000104881
+Region (0.000000) - (0.437500)
+       (0.000000) - (0.500000)
+       (0.750000) - (1.000000)
+[1] 0.027174 +- 0.000682405(0)
+    0.0271499 +- 0.000119231(0)  	chisq 0.00120239
+[2] 0.0168197 +- 0.000111449(0)
+    0.016818 +- 1.94724e-05(0)  	chisq 0.000215672
+Region (0.718750) - (1.000000)
+       (0.500000) - (1.000000)
+       (0.000000) - (0.500000)
+[1] 0.0498582 +- 0.00064804(0)
+    0.0498649 +- 0.000113226(0)  	chisq 0.000103963
+[2] 0.0153507 +- 9.16558e-05(0)
+    0.0153502 +- 1.60142e-05(0)  	chisq 3.48482e-05
+Region (0.714000) - (1.000000)
+       (0.000000) - (0.500000)
+       (0.000000) - (0.500000)
+[1] 0.0670207 +- 0.000626677(0)
+    0.0670054 +- 0.000109494(0)  	chisq 0.000576853
+[2] 0.0217486 +- 0.000163216(0)
+    0.0217454 +- 2.85172e-05(0)  	chisq 0.000386072
+Region (0.718750) - (1.000000)
+       (0.000000) - (0.500000)
+       (0.500000) - (1.000000)
+[1] 0.108898 +- 0.00101238(0)
+    0.108874 +- 0.000176884(0)  	chisq 0.000558483
+[2] 0.0153509 +- 9.26384e-05(0)
+    0.0153502 +- 1.61859e-05(0)  	chisq 5.72234e-05
+Region (0.437500) - (0.718750)
+       (0.000000) - (0.500000)
+       (0.500000) - (1.000000)
+[1] 0.0785791 +- 0.000894264(0)
+    0.0785473 +- 0.000156247(0)  	chisq 0.00122629
+[2] 0.0179365 +- 0.000155586(0)
+    0.0179322 +- 2.71842e-05(0)  	chisq 0.000747781
+Region (0.437500) - (0.718750)
+       (0.500000) - (1.000000)
+       (0.500000) - (1.000000)
+[1] 0.0593099 +- 0.000898252(0)
+    0.0593121 +- 0.000156944(0)  	chisq 5.99544e-06
+[2] 0.0134977 +- 9.32652e-05(0)
+    0.0134977 +- 1.62954e-05(0)  	chisq 3.57566e-08
+Region (0.437500) - (0.714000)
+       (0.000000) - (0.500000)
+       (0.000000) - (0.500000)
+[1] 0.04669 +- 0.000529049(0)
+    0.0466714 +- 9.24361e-05(0)  	chisq 0.0012081
+[2] 0.0264635 +- 0.000307597(0)
+    0.0264546 +- 5.37438e-05(0)  	chisq 0.000811867
+Region (0.437500) - (0.718750)
+       (0.500000) - (1.000000)
+       (0.000000) - (0.500000)
+[1] 0.0359733 +- 0.000544817(0)
+    0.0359746 +- 9.51912e-05(0)  	chisq 5.99544e-06
+[2] 0.0179345 +- 0.000154589(0)
+    0.0179324 +- 2.701e-05(0)  	chisq 0.000175312
+Region (0.000000) - (0.437500)
+       (0.000000) - (0.500000)
+       (0.500000) - (0.750000)
+[1] 0.0211631 +- 0.000534108(0)
+    0.0211444 +- 9.33199e-05(0)  	chisq 0.00119049
+[2] 0.0202515 +- 0.000198381(0)
+    0.0202448 +- 3.46614e-05(0)  	chisq 0.00111542
+Region (0.000000) - (0.437500)
+       (0.500000) - (1.000000)
+       (0.500000) - (0.750000)
+[1] 0.0159652 +- 0.000464641(0)
+    0.015965 +- 8.11826e-05(0)  	chisq 1.94614e-07
+[2] 0.013689 +- 0.000101469(0)
+    0.0136873 +- 1.77287e-05(0)  	chisq 0.000284013
+Totals:
+[1] 0.664635 +- 0.0004823  	chisq 0.0104742 (14 df)
+[2] 0.307817 +- 0.000298442  	chisq 0.00493667 (14 df)
+integral: 0.6646352 (+-0.00048)
+nregions: 14; integral: 0.3078175 (+-3e-04)
+nregions: 14; number of evaluations:  4082; probability:  1.110223e-16 0.000000e+00 
+> 
+> 
+> # ------------------------------------------------------------
+> # Test de peakfinder: cf peakf.R
+> # ------------------------------------------------------------
+> # Essai de key1 différentes
+> VERBOSE <- 0
+> KEY1 <- 47
+> cat(" KEY1=47 pseudo.random=1\n")
+ KEY1=47 pseudo.random=1
+> divonne(NDIM, NCOMP, integrand,
++                   rel.tol=EPSREL, abs.tol=EPSABS,
++                flags=list(pseudo.random=1, verbose=VERBOSE) ,
++                 key1= KEY1)
+
+integral: 0.6646195 (+-0.00064)
+nregions: 14; number of evaluations:  3052; probability:  1.110223e-16 
+> 
+> cat(" KEY1=447 pseudo.random=1\n")
+ KEY1=447 pseudo.random=1
+> divonne(NDIM, NCOMP, integrand,
++                   rel.tol=EPSREL, abs.tol=EPSABS,
++                flags=list(pseudo.random=1, verbose=VERBOSE) ,
++                 key1= 447)
+
+integral: 0.6646681 (+-0.00013)
+nregions: 14; number of evaluations:  13416; probability:  0 
+> 
+> 
+> cat(" KEY1=-447 pseudo.random=1\n")
+ KEY1=-447 pseudo.random=1
+> divonne(NDIM, NCOMP, integrand,
++                   rel.tol=EPSREL, abs.tol=EPSABS,
++                flags=list(pseudo.random=1, verbose=VERBOSE) ,
++                 key1= -447)
+
+integral: 0.6648221 (+-0.00047)
+nregions: 24; number of evaluations:  34622; probability:  1 
+> 
+> 
+> cat(" KEY1=-447 pseudo.random=0\n")
+ KEY1=-447 pseudo.random=0
+> divonne(NDIM, NCOMP, integrand,
++                   rel.tol=EPSREL,  abs.tol=EPSABS,
++                flags=list(pseudo.random=0, verbose=VERBOSE) ,
++                 key1= -447)
+
+integral: 0.6646277 (+-0.00028)
+nregions: 14; number of evaluations:  19405; probability:  0.03333225 
+> 
+> 
+> cat(" KEY1=0 pseudo.random=0\n")
+ KEY1=0 pseudo.random=0
+> divonne(NDIM, NCOMP, integrand,
++                   rel.tol=EPSREL,  abs.tol=EPSABS,
++                flags=list(pseudo.random=0, verbose=VERBOSE) ,
++                 key1= 0)
+
+integral: 0.6646195 (+-0.00064)
+nregions: 14; number of evaluations:  3052; probability:  1.110223e-16 
+> cat(" KEY1=0,  pseudo.random=1\n")
+ KEY1=0,  pseudo.random=1
+> divonne(NDIM, NCOMP, integrand,
++                   rel.tol=EPSREL,  abs.tol=EPSABS,
++                flags=list(pseudo.random=1, verbose=VERBOSE) ,
++                 key1= 0)
+
+integral: 0.6646195 (+-0.00064)
+nregions: 14; number of evaluations:  3052; probability:  1.110223e-16 
+> 

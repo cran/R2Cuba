@@ -1,0 +1,139 @@
+
+R version 2.8.1 (2008-12-22)
+Copyright (C) 2008 The R Foundation for Statistical Computing
+ISBN 3-900051-07-0
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> #dyn.load("../src/cuba.so");source("../R/divonne.R");source("../R/cuhre.R");source("../R/vegas.R");source("../R/suave.R");source("../R/commoncuba.R")
+> library("R2Cuba")
+> 
+> #----------------------------------------
+> # Generation of the configuration of the centers:
+> set.seed(5)
+> ndim <- 2
+> ncomp <- 1
+> n.pts <- 50
+> pattern <- matrix(runif(ndim*n.pts),nrow=ndim)
+> sigma <- 0.01
+> rownames(pattern) <- c("x","y")
+> 
+> #----------------------------------------
+> # Exact computation of the integral:
+> int.val <- function(pattern,sigma) {
++   fs <- array(pnorm(c(1,0),rep(pattern,each=2),sigma),c(2,2,ncol(pattern)))
++   fs.diff <- apply(fs,c(2,3),diff)
++   sum(apply(fs.diff,2,prod))
++ }
+> cat("Expected result:\n")
+Expected result:
+> print(int.val(pattern,sigma)) # 49.66977
+[1] 49.66977
+> #----------------------------------------
+> #Function integrand: 
+> pat.dist <- function(x, sigma) {
++   sum(apply(matrix(dnorm(x,pattern,sigma),2),2,prod))
++ }
+> #----------------------------------------
+> # Common arguments:
+> flags <- list(verbose=0,final=1)
+> rel.tol <- 0.1 # Not so good, for timing purpose
+> #ptm <- proc.time() # total timing 
+> #----------------------------------------
+> cat("\ncuhre\n")
+
+cuhre
+>  print(cuhre(ndim,ncomp,pat.dist,sigma,
++     rel.tol=rel.tol,flags=flags))
+
+integral: 49.66281 (+-4.9)
+nregions: 228; number of evaluations:  29575; probability:  0 
+> 
+> #----------------------------------------
+> cat("\nvegas\n")
+
+vegas
+> print(vegas(ndim,ncomp,pat.dist,sigma,
++        rel.tol=rel.tol,flags=flags))
+
+integral: 47.76541 (+-4.1)
+number of evaluations:  4500; probability:  0.4055702 
+> #----------------------------------------
+> cat("\nsuave\n")
+
+suave
+> print(suave(ndim,ncomp,pat.dist,sigma,
++       rel.tol=rel.tol,flags=flags))
+
+integral: 53.83867 (+-4.7)
+nregions: 4; number of evaluations:  4000; probability:  0.005895374 
+> #----------------------------------------
+> cat("\ndivonne\n")
+
+divonne
+> print(divonne(ndim,ncomp,pat.dist,sigma,
++           rel.tol=rel.tol,flags=flags))
+
+integral: 35.48077 (+-3.3)
+nregions: 32; number of evaluations:  5665; probability:  0.0001540994 
+> #----------------------------------------
+> cat("\ndivonne with  xgiven = the centers\n")
+
+divonne with  xgiven = the centers
+> print(divonne(ndim,ncomp,pat.dist,sigma,xgiven=pattern,
++                 rel.tol=rel.tol,flags=flags))            
+
+integral: 47.29323 (+-4.5)
+nregions: 29; number of evaluations:  5969; probability:  4.179577e-10 
+> #----------------------------------------
+> cat("\ndivonne with  xgiven = the centers and the peaks\n")
+
+divonne with  xgiven = the centers and the peaks
+> # Vertices creation:
+> require("deldir")
+Loading required package: deldir
+deldir 0.0-7 
+> voronoi <- deldir(pattern["x",],pattern["y",],rw=c(0,1,0,1))
+> vertices <- unique(rbind(as.matrix(voronoi$dirsgs[,1:2]),
++                          as.matrix(voronoi$dirsgs[,3:4])))
+> # The maxima:
+> peaks <- rbind(vertices,t(pattern))
+> print(divonne(ndim,ncomp,pat.dist,sigma,xgiven=t(peaks),
++                   rel.tol=rel.tol,flags=flags))             
+
+integral: 47.29323 (+-4.5)
+nregions: 29; number of evaluations:  5898; probability:  4.179575e-10 
+> #----------------------------------------
+> cat("\ndivonne with  peakfinder\n")
+
+divonne with  peakfinder
+> peakfinder <- function(bounds) {
++   idx <- (peaks[,1]>=bounds[1,1]) & (peaks[,1]<=bounds[1,2])
++   idx <- idx & (peaks[,2]>=bounds[2,1]) & (peaks[,2]<=bounds[2,2])
++   retour <- t(peaks[idx,])
++   if (ncol(retour)==0) {
++     retour <- bounds
++   }
++   return(retour)
++ }
+> print(divonne(ndim,ncomp,pat.dist,sigma,
++                           peakfinder=peakfinder,nextra=nrow(peaks),
++                 rel.tol=rel.tol,flags=flags))            
+
+integral: 47.29323 (+-4.5)
+nregions: 29; number of evaluations:  6279; probability:  4.179575e-10 
+> #----------------------------------------
+> #cat("Total time", (proc.time() - ptm),"\n")
+> #----------------------------------------
+> 
+> 

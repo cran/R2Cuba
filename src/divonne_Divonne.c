@@ -1,0 +1,336 @@
+/*
+	Divonne.c
+		Multidimensional integration by partitioning
+		originally by J.H. Friedman and M.H. Wright
+		(CERNLIB subroutine D151)
+		this version by Thomas Hahn
+		last modified 2 Mar 06 th
+*/
+
+#include "divonne_util.c"
+/* Compilation note for R interface: add inclR.h */
+#include "inclR.h"
+/* Compilation note for R interface: modif #define Print(s) puts(s); fflush(stdout) */
+#define Print(s) Rprintf(s)
+
+static Integrand integrand_;
+static PeakFinder peakfinder_;
+/*********************************************************************/
+/* Compilation note for R interface: 
+   The integration R function and its execution environnement */
+/*********************************************************************/
+SEXP rho, f, peakf;		
+
+/*Compilation note for R interface: 
+  global, to be used by Rpeakf, DoSample and SampleExtra*/
+real *lower_, *upper_,  prdbounds_;
+/* verif_: to verify the dimensions of the structures returned by
+   the user functions: only used at the first call */
+bool verif_; 
+
+/*********************************************************************/
+/*  The function RIntegrand calls the R user function */
+/*********************************************************************/
+static void RIntegrand(ccount *ndim, creal xx[],
+		       ccount  *ncomp, 
+		       creal *lower, creal *upper, creal prdbounds,
+		       real ff[],
+		       cint *phase)
+{
+  SEXP args, argphase, s, t, resultsxp;
+  int i;
+ /*f:  the R function and its environment, rho are global */
+  // The input arguments are x +1 phase 
+   PROTECT(args=allocVector(REALSXP, ( *ndim )));
+PROTECT(argphase=allocVector(REALSXP, (1 )));
+// The output  arguments are ncomp values
+  PROTECT(resultsxp=allocVector(REALSXP, ( *ncomp )));
+ /* Fill in the input arguments with rescaling between   0-1,
+     according to the bounds */
+  for (i =0; i<*ndim; i++) 
+    REAL(args)[i] = xx[i] * (upper_[i] - lower_[i]) + lower_[i];
+  REAL(argphase)[ 0] = *phase;
+
+  /* Call the R function */
+PROTECT(t = s = allocList(3));
+         SET_TYPEOF(s, LANGSXP);
+         SETCAR(t, f); t = CDR(t);
+         SETCAR(t,  args); t = CDR(t);
+         SETCAR(t, argphase); 
+
+ PROTECT(resultsxp=eval(s,rho));
+ UNPROTECT(5);
+
+
+ if (verif_== true) {
+ if  (length(resultsxp) != *ncomp)
+   error("Function integrand does not return a vector of length ncomp");
+ verif_= false; // do not verify the next time
+ }
+
+
+ for (i =0; i<*ncomp;  i++) {
+    ff[i] = REAL(resultsxp)[i] * prdbounds;
+ }
+
+} // End RIntegrand
+
+/*********************************************************************/
+/* The function Rpeakf calls the R user function */
+/*********************************************************************/
+static void Rpeakf(const int *ndim, 
+		   const double b[],
+		    int *n, double x[])
+{
+  SEXP args, callsxp,resultsxp, dim;
+  int i,j, p,l,nl, kl, nx;
+
+ /*peakf:  the R function and its environment, rho are global */
+  PROTECT(args=allocVector(REALSXP, ( 2*(*ndim) )));
+  /*  n is the maximum number of points in output,
+i.e the argument nextra of the function divonne */
+  PROTECT(resultsxp=allocVector(REALSXP, (1+ ((*n) * (*ndim)))));
+  /* Rescaler les bornes inf et sup qui sont dans l'hypercube unité
+     selon l'échelle de l'utilisateur */
+  /* Les binf et bsup: les mettre dans une matrice R (ndim,2) */
+
+ kl=0;
+  j=0;
+  for (i =0; i< *ndim; i++) {
+    l=kl;
+    kl++;
+  for (p=0; p<2; p++) {
+    REAL(args)[l] = b[j++] * (upper_[i] - lower_[i]) + lower_[i];
+    l=l+ *ndim;
+  }
+  } // fin i
+
+  /* Put the bounds into a R matrix */
+PROTECT(dim = allocVector(INTSXP, 2));
+       INTEGER(dim)[0] = *ndim; INTEGER(dim)[1] = 2;
+       setAttrib(args, R_DimSymbol, dim);
+     
+       /* Affect labels to the columns */
+       SEXP dimnames, elmt;
+       // Create the list dimnames
+PROTECT(dimnames = allocVector(VECSXP, 2));
+// Create a vector of length 2 to store the columns labels
+ PROTECT( elmt = allocVector(STRSXP, 2));
+ // Affect the labels
+ SET_STRING_ELT( elmt,0, mkChar("lower"));
+ SET_STRING_ELT( elmt,1, mkChar("upper"));
+ // Affect the vector to the 2nd component of dimnames
+ SET_VECTOR_ELT(dimnames, 1, elmt);
+ // Affect  dimnames to the argument
+ setAttrib(args, R_DimNamesSymbol, dimnames);
+
+ /* Call the R function */
+  PROTECT(callsxp=lang2( peakf, args));
+ PROTECT(resultsxp=eval(callsxp,rho));
+ UNPROTECT(7);
+
+ nx=INTEGER(getAttrib(resultsxp, R_DimSymbol))[1];
+
+
+ /* Verify the dimensions of the result */
+  if (verif_== true) {
+ nl=INTEGER(getAttrib(resultsxp, R_DimSymbol))[0];
+
+ if (nl != *ndim)
+   error("peakfinder does not return a matrix with ndim rows.");
+
+
+ // In output, n is the effective number of pointd
+ // Verify it is <= nextra
+ if (nx > (*n))
+   error("peakfinder returns more than nextra points");
+  } // fin verif
+
+ *n =nx;
+ j=0;
+   /* Rescale the points into the unit hypercube */
+ /* In R x is a matrix (ndim, npoints),
+    so, the values are stored point by point */
+   for (p=0; p< *n; p++) {
+ for (i =0; i< *ndim; i++) {
+  switch(TYPEOF(resultsxp)) {
+         case REALSXP:
+     x[j] = (REAL(resultsxp)[j] - lower_[i]) / (upper_[i] - lower_[i]);
+     break;
+  case INTSXP:
+     x[j] = (INTEGER(resultsxp)[j] - lower_[i]) / (upper_[i] - lower_[i]);
+     break;
+  default:
+    error("peakfinder does not return a real or integer matrix");
+  } // fin switch
+
+     j++;
+   } // fin i
+ } // fin p
+
+} // fin Rpeakf
+
+
+
+/*********************************************************************/
+
+static inline void DoSample(number n, ccount ldx, creal *x,real *f)
+{
+  neval_ += n;
+
+  while( n-- ) {
+    integrand_(&ndim_, x, &ncomp_,   lower_, upper_, prdbounds_,
+            f, &phase_);
+    x += ldx;
+    f += ncomp_;
+  }
+}
+
+/*********************************************************************/
+
+static inline count SampleExtra( cBounds *b)
+{
+  number n = nextra_;
+  peakfinder_(&ndim_, b, &n, xextra_);
+  DoSample(n, ldxgiven_, xextra_, fextra_);
+  return n;
+}
+
+/*********************************************************************/
+
+#include "divonne_common.h"
+Extern void EXPORT(Divonne)(ccount ndim, ccount ncomp,
+  Integrand integrand,
+  creal epsrel, creal epsabs,
+  cint flags, cnumber mineval, cnumber maxeval,
+  cint key1, cint key2, cint key3, ccount maxpass,
+  creal border, creal maxchisq, creal mindeviation,
+  cnumber ngiven, ccount ldxgiven, real *xgiven,
+  cnumber nextra, PeakFinder peakfinder,
+  int *pnregions, number *pneval, int *pfail,
+  real *integral, real *error, real *prob)
+{
+
+  ndim_ = ndim;
+  ncomp_ = ncomp;
+
+  if( BadComponent(ncomp) ||
+      BadDimension(ndim, flags, key1) ||
+      BadDimension(ndim, flags, key2) ||
+      ((key3 & -2) && BadDimension(ndim, flags, key3)) ) *pfail = -1;
+  else {
+    neval_ = neval_opt_ = neval_cut_ = 0;
+    integrand_ = integrand;
+    peakfinder_ = peakfinder;
+    border_.lower = border;
+    border_.upper = 1 - border_.lower;
+    ngiven_ = ngiven;
+    xgiven_ = NULL;
+    ldxgiven_ = IMax(ldxgiven, ndim_);
+    nextra_ = nextra;
+
+    if( ngiven + nextra ) {
+      cnumber nxgiven = ngiven*ldxgiven;
+      cnumber nxextra = nextra*ldxgiven;
+      cnumber nfgiven = ngiven*ncomp;
+      cnumber nfextra = nextra*ncomp;
+
+      Alloc(xgiven_, nxgiven + nxextra + nfgiven + nfextra);
+      xextra_ = xgiven_ + nxgiven;
+      fgiven_ = xextra_ + nxextra;
+      fextra_ = fgiven_ + nfgiven;
+
+      if( nxgiven ) {
+        phase_ = 0;
+        Copy(xgiven_, xgiven, nxgiven);
+        DoSample(ngiven_, ldxgiven_, xgiven_, fgiven_);
+      }
+    }
+
+    *pfail = Integrate( epsrel, Max(epsabs, NOTZERO),
+      flags, mineval, maxeval, key1, key2, key3, maxpass,
+      maxchisq, mindeviation,
+      integral, error, prob);
+
+    *pnregions = nregions_;
+    *pneval = neval_;
+
+    if( xgiven_ ) free(xgiven_);
+  }
+}
+
+/*********************************************************************/
+void (divonne)(ccount *pndim, ccount *pncomp,
+  Integrand integrand,
+ creal *pepsrel, creal *pepsabs,
+  cint *pflags, cnumber *pmineval, cnumber *pmaxeval,
+  cint *pkey1, cint *pkey2, cint *pkey3, ccount *pmaxpass,
+  creal *pborder, creal *pmaxchisq, creal *pmindeviation,
+  cnumber *pngiven, ccount *pldxgiven, real *xgiven,
+  cnumber *pnextra, PeakFinder peakfinder,
+  int *pnregions, number *pneval, int *pfail,
+  real *integral, real *error, real *prob)
+{
+
+  EXPORT(Divonne)(*pndim, *pncomp,
+    integrand,
+    *pepsrel, *pepsabs,
+    *pflags, *pmineval, *pmaxeval,
+    *pkey1, *pkey2, *pkey3, *pmaxpass,
+    *pborder, *pmaxchisq, *pmindeviation,
+    *pngiven, *pldxgiven, xgiven,
+    *pnextra, peakfinder,
+    pnregions, pneval, pfail,
+    integral, error, prob);
+}
+
+/*********************************************************************/
+/*  Compilation note for R interface: add this subroutine
+  interface between R  and divonne */
+/*********************************************************************/
+
+
+void Rdivonne(int *pndim, int *pncomp,
+	     void ** integrand, void *env,
+    real *lower, real *upper, real *prdbounds,
+double *pepsrel, double *pepsabs,
+   int *pmersenneseed, int *pflags, int *pmineval, int *pmaxeval,
+	      int *key1, int *key2, int *key3,
+	      int *maxpass, double *border,
+double *pmaxchisq, double *pmindeviation,
+  int *pngiven, int *pldxgiven, double *xgiven,
+	      int *pnextra, void ** peakfinder,
+  int *pnregions, int *pneval, int *pfail,
+  double *integral, double *error, double *prob)
+{
+
+
+  /* store the R function and its environment  into a global*/
+  rho= (SEXP)(env);
+  f= (SEXP)(integrand);
+  peakf = (SEXP)peakfinder;
+  lower_ = lower;
+  upper_ = upper;
+  prdbounds_ = *prdbounds;
+
+   if (NA_INTEGER != *pmersenneseed) 
+    SUFFIX(mersenneseed)= *pmersenneseed;
+
+    verif_= true;
+
+  /* call divonne */
+
+  divonne((ccount *)pndim, (ccount *)pncomp,
+	(Integrand)RIntegrand,
+(creal *)pepsrel, (creal *)pepsabs,
+	(cint *)pflags, (cnumber *)pmineval, (cnumber *)pmaxeval,
+ (cint *)key1, (cint *)key2, (cint *)key3, 
+(ccount *)maxpass,
+  (creal *)border, (creal *)pmaxchisq, (creal *)pmindeviation,
+	  (cnumber *)pngiven, (ccount *)pldxgiven, (double *)xgiven,
+	  (cnumber *)pnextra, (PeakFinder) Rpeakf,
+	(count *) pnregions,
+	(number *)pneval, (int *)pfail,
+	(real *)integral, (real *)error, (real *)prob);
+
+} // End Rdivonne
