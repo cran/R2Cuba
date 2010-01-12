@@ -6,7 +6,7 @@
 */
 
 
-#include "cuhre_util.c"
+#include "cuhre_util.h"
 /* Compilation note for R interface: add inclR.h */
 #include "inclR.h"
 

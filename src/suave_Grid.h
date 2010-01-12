@@ -1,3 +1,5 @@
+#ifndef __suave_grid_h__
+#define __suave_grid_h__
  //Compilation note for R interface: move into a .h
 /*
 	Grid.c
@@ -136,3 +138,4 @@ static void StretchGrid(cGrid grid, Grid gridL, Grid gridR)
 }
 
 
+#endif

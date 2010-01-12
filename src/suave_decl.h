@@ -6,8 +6,8 @@
 */
 
 //Compilation note for R interface: add ifndef
-#ifndef SUAVE_DECLH
-#define SUAVE_DECLH
+#ifndef __suave_decl_h__
+#define __suave_decl_h__
 
 #include "common_stddecl.h"
 

@@ -1,3 +1,5 @@
+#ifndef __vegas_common_h__
+#define __vegas_common_h__
 //Compilation note for R interface: move into a .h
 /*
 	common.c
@@ -8,7 +10,7 @@
 
 
 #include "common_Random.h"
-#include "common_ChiSquare.c"
+#include "common_ChiSquare.h"
 #include "vegas_Grid.h"
 #include "vegas_Integrate.h"
 
@@ -29,4 +31,4 @@ static inline bool BadComponent(cint ncomp)
 #endif
   return ncomp < 1;
 }
-
+#endif

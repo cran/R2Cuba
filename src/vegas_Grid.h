@@ -1,3 +1,5 @@
+#ifndef __vegas_grid_h__
+#define __vegas_grid_h__
 //Compilation note for R interface: move into a .h
 /*
 	Grid.c
@@ -104,3 +106,4 @@ static void RefineGrid(Grid grid, Grid margsum, cint flags)
   grid[NBINS - 1] = 1;
 }
 
+#endif

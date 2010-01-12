@@ -1,3 +1,6 @@
+#ifndef __divonne_explore_h__
+#define __divonne_explore_h__
+
 //Compilation note for R interface: move Explore.c into divonne_Explore.h
 /*
 	Explore.c
@@ -33,7 +36,8 @@ static bool Explore(count iregion, cSamples *samples, cint depth, cint flags)
   Result *result;
 
   /* needed as of gcc 3.3 to make gcc correctly address region #@$&! */
-  sizeof(*region);
+  /*  sizeof(*region); */
+
 
   if( SPLICE ) {
     if( nregions_ == size_ ) {
@@ -182,3 +186,4 @@ skip:
   return true;
 }
 
+#endif

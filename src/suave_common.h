@@ -1,3 +1,5 @@
+#ifndef __suave_common_h__
+#define __suave_common_h__
 //Compilation note for R interface: move into a .h
 
 /*
@@ -9,7 +11,7 @@
 
 
 #include "common_Random.h"
-#include "common_ChiSquare.c"
+#include "common_ChiSquare.h"
 #include "suave_Grid.h"
 #include "suave_Sample.h"
 #include "suave_Fluct.h"
@@ -33,3 +35,4 @@ static inline bool BadComponent(cint ncomp)
   return ncomp < 1;
 }
 
+#endif

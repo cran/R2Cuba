@@ -7,7 +7,7 @@
 		last modified 2 Mar 06 th
 */
 
-#include "divonne_util.c"
+#include "divonne_util.h"
 /* Compilation note for R interface: add inclR.h */
 #include "inclR.h"
 /* Compilation note for R interface: modif #define Print(s) puts(s); fflush(stdout) */

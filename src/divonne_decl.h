@@ -1,3 +1,4 @@
+
 /*
 	decl.h
 		Type declarations
@@ -5,8 +6,8 @@
 		last modified 25 May 09 th
 */
 //Compilation note for R interface: add ifndef
-#ifndef DIVONNE_DECLH
-#define DIVONNE_DECLH
+#ifndef __divonne_decl_h__
+#define __divonne_decl_h__
 
 
 #include "common_stddecl.h"

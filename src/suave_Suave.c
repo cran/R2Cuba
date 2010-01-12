@@ -6,7 +6,7 @@
 */
 
 
-#include "suave_util.c"
+#include "suave_util.h"
 /* Compilation note for R interface: add inclR.h  */
 #include "inclR.h"
 

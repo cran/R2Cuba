@@ -1,3 +1,6 @@
+#ifndef __cuhre_rule_h__
+#define __cuhre_rule_h__
+
 // Compilation note for R interface: move Rule.c into Rule.h
 /*
 	Rule.c
@@ -597,7 +600,7 @@ next:
   for( dim = 1; dim < ndim; ++dim ) {
     creal gd = g[dim];
     if( g[dim - 1] > gd ) {
-      count i, ix, j = dim, dx = dim - 1;
+      count i, ix = 0, j = dim, dx = dim - 1;
       for( i = 0; i < --j; ++i ) {
         creal tmp = g[i];
         g[i] = g[j];
@@ -729,3 +732,4 @@ static void Sample(cRule *rule, void *voidregion, cint flags)
   }
 }
 
+#endif

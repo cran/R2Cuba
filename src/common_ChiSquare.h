@@ -1,3 +1,6 @@
+#ifndef __chisquare_h__
+#define  __chisquare_h__
+
 /*
 	ChiSquare.c
 		the chi-square cdf
@@ -11,7 +14,7 @@
 #ifdef HAVE_ERF
 #define Erf erf
 #else
-#include "common_Erf.c"
+#include "common_Erf.h"
 #endif
 
 static inline real Normal(creal x)
@@ -67,3 +70,4 @@ static real ChiSquare(creal x, cint df)
   return Max(0., y);
 }
 
+#endif

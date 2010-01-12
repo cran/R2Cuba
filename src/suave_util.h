@@ -1,3 +1,5 @@
+#ifndef __suave_util_h__
+#define __suave_util_h__
 /*
 	util.c
 		Utility functions
@@ -19,6 +21,6 @@ static number neval_;
 
 
 #ifdef DEBUG
-#include "common_debug.c"
+#include "common_debug.h"
 #endif
-
+#endif

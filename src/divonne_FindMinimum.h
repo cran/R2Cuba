@@ -1,3 +1,5 @@
+#ifndef __divonne_findminimum_h__
+#define __divonne_findminimum_h__
 //Compilation note for R interface: move into a .h
 /*
 	FindMinimum.c
@@ -583,7 +585,7 @@ static real FindMinimum(cBounds *b, real *xmin, real fmin)
     if( nfree > 0 ) {
       real plen, pleneps;
       real minstep;
-      count i, mini, minfix;
+      count i, mini =0, minfix = 0;
       Point low;
 
       LinearSolve(nfree, hessian, gfree, p);
@@ -699,3 +701,4 @@ releasebounds:
   return fmin;
 }
 
+#endif

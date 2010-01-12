@@ -1,3 +1,6 @@
+#ifndef __divonne_sample_h__
+#define __divonne_sample_h__
+
 //Compilation note for R interface: move into a .h
 /*
 	Sample.c
@@ -252,3 +255,4 @@ static real Sample(creal *x0)
   return f;
 }
 
+#endif

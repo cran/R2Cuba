@@ -1,3 +1,6 @@
+#ifndef __suave_integrate_h__
+#define __suave_integrate_h__
+
  //Compilation note for R interface: move into a .h
 /*
 	Integrate.c
@@ -294,3 +297,4 @@ abort:
   return fail;
 }
 
+#endif

@@ -1,3 +1,6 @@
+#ifndef __cuhre_integrate_h__
+#define __cuhre_integrate_h__
+
 //Compilation note for R interface: move Integrate.c into cuhre_Integrate.h
 /*
 	Integrate.c
@@ -269,3 +272,4 @@ abort:
   return fail;
 }
 
+#endif

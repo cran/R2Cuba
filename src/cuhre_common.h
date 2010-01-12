@@ -1,3 +1,6 @@
+#ifndef __cuhre_common_h__
+#define __cuhre_common_h__
+
 // Compilation note for R interface: move common.c into cuhre_common.h
 /*
 	common.c
@@ -7,7 +10,7 @@
 */
 
 
-#include "common_ChiSquare.c"
+#include "common_ChiSquare.h"
 #include "cuhre_Rule.h"
 #include "cuhre_Integrate.h"
 
@@ -29,3 +32,4 @@ static inline bool BadComponent(cint ncomp)
   return ncomp < 1;
 }
 
+#endif

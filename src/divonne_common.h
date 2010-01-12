@@ -1,3 +1,6 @@
+#ifndef __divonne_common_h__
+#define __divonne_common_h__
+
 // Compilation note for R interface:  move common.c into divonne_common.h
 
 /*
@@ -12,8 +15,9 @@ static bool Explore(count iregion, cSamples *samples, cint depth, cint flags);
 
 static void Split(count iregion, int depth);
 
+
 #include "common_Random.h"
-#include "common_ChiSquare.c"
+#include "common_ChiSquare.h"
 #include "divonne_Rule.h"
 #include "divonne_Sample.h"
 #include "divonne_FindMinimum.h"
@@ -42,3 +46,4 @@ static inline bool BadComponent(cint ncomp)
   return ncomp < 1;
 }
 
+#endif

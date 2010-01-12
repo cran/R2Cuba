@@ -1,3 +1,5 @@
+#ifndef __divonne_rule_h__
+#define __divonne_rule_h__
 //Compilation note for R interface: move into a .h
 /*
 	Rule.c
@@ -679,3 +681,4 @@ static void SampleRule(cSamples *samples, cBounds *b, creal vol)
   }
 }
 
+#endif

@@ -1,3 +1,5 @@
+#ifndef __divonne_split_h__
+#define __divonne_split_h__
 //Compilation note for R interface: move into a .h
 /*
 	Split.c
@@ -348,3 +350,4 @@ static void Split(count iregion, int depth)
   }
 }
 
+#endif

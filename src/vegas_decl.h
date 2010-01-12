@@ -6,8 +6,8 @@
 */
 
 // Compilation note for R interface: add ifndef
-#ifndef VEGAS_DECLH
-#define VEGAS_DECLH
+#ifndef __vegas_decl_h__
+#define __vegas_decl_h__
 
 #include "common_stddecl.h"
 

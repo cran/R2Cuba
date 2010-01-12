@@ -1,3 +1,5 @@
+#ifndef __divonne_util_h__
+#define  __divonne_util_h__
 /*
 	util.c
 		Utility functions
@@ -27,6 +29,6 @@ static void *voidregion_;
 static count size_;
 
 #ifdef DEBUG
-#include "common_debug.c"
+#include "common_debug.h"
 #endif
-
+#endif

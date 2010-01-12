@@ -1,4 +1,5 @@
-
+#ifndef __debug_h__
+#define  __debug_h__
 /* Compilation note for R interface: 
    debug.c is moved into  debug.h for it not to be compiled */
 
@@ -87,3 +88,4 @@ static inline void DEBMem(const char *s)
   DEB("MEM %s: %d kbytes\n", s, kbytes);
 }
 
+#endif

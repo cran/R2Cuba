@@ -5,8 +5,8 @@
 		last modified 8 Apr 09 th
 */
 //Compilation note for R interface: add ifndef
-#ifndef CUHRE_DECLH
-#define CUHRE_DECLH
+#ifndef __cuhre_decl_h__
+#define __cuhre_decl_h__
 
 #include "common_stddecl.h"
 

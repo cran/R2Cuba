@@ -1,3 +1,5 @@
+#ifndef __erf_h__
+#define __erf_h__
 /*
 	Erf.c
 		Gaussian error function
@@ -51,3 +53,4 @@ static real Erf(creal x)
   return x*(c[0] + y*(c[1] + y*(c[2] +
     y*(c[3] + y*(c[4] + y*c[5])))));
 }
+#endif

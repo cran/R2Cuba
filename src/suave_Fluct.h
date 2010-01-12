@@ -1,3 +1,5 @@
+#ifndef __suave_fluct_h__
+#define __suave_fluct_h__
 //Compilation note for R interface: move into a .h
 /*
 	Fluct.c
@@ -62,3 +64,4 @@ static void Fluct(Var *var, real flatness,
   }
 }
 
+#endif

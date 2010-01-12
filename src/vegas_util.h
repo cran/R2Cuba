@@ -1,7 +1,7 @@
 //Compilation note for R interface: move into a .h
 //Compilation note for R interface: add ifndef
-#ifndef VEGAS_UTILH
-#define VEGAS_UTILH
+#ifndef __vegas_util_h__
+#define __vegas_util_h__
 /*
 	util.c
 		Utility functions

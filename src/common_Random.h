@@ -1,3 +1,5 @@
+#ifndef __random_h__
+#define  __random_h__
 // Compilation note for R interface: move Random.c into Random.h
 /*
 	Random.c
@@ -287,3 +289,4 @@ static inline void SkipRandom(cnumber n)
   else SobolSkip(n);
 }
 
+#endif

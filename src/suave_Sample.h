@@ -1,3 +1,5 @@
+#ifndef __suave_sample_h__
+#define __suave_sample_h__
 //Compilation note for R interface: move into a .h
 /*
 	Sample.c
@@ -26,7 +28,7 @@ static void Sample(cnumber nnew, void *voidregion,
   count comp, dim, df;
   number n;
   Cumulants cumul[NCOMP];
-  char **ss, *s;
+  char **ss=NULL, *s="";
   ccount chars = 128*(region->div + 1);
 
   creal jacobian = 1/ldexp((real)nnew, region->div);
@@ -172,3 +174,4 @@ static void Sample(cnumber nnew, void *voidregion,
   }
 }
 
+#endif

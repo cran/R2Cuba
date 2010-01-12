@@ -181,4 +181,3 @@ static inline real Weight(creal sum, creal sqsum, cnumber n)
 #define Abs1(a) (((a) ^ NegQ(a)) - NegQ((a) - 1))
 
 #endif
-

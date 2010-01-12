@@ -1,7 +1,7 @@
 //Compilation note for R interface: move into a .h
 //Compilation note for R interface: add ifndef
-#ifndef VEGAS_INTEGRATEH
-#define VEGAS_INTEGRATEH
+#ifndef __vegas_integrate_h__
+#define __vegas_integrate_h__
 
 ////Compilation note for R interface: add decodflags
 extern
