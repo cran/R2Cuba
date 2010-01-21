@@ -11,6 +11,7 @@
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
+#include "inclR.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -29,6 +30,12 @@
 #ifndef NCOMP
 #define NCOMP ncomp_
 #endif
+#ifndef MAXNDIM
+#define MAXNDIM 40
+#endif
+#ifndef MAXNCOMP
+#define MAXNCOMP 10
+#endif
 
 
 #define VERBOSE (flags & 3)
@@ -41,6 +48,22 @@
 
 #define NOTZERO 0x1p-104
 
+
+#define SOBOL_MINDIM 1
+#define SOBOL_MAXDIM 40
+
+/* length of state vector */
+#define MERSENNE_N 624
+
+/* period parameter */
+#define MERSENNE_M 397
+
+/* 32 or 53 random bits */
+#define RANDOM_BITS 32
+
+/*  Compilation note for R interface:
+ modif #define Print(s) puts(s); fflush(stdout) */
+#define Print(s) Rprintf(s)
 
 #define Elements(x) (sizeof(x)/sizeof(*x))
 
@@ -124,7 +147,7 @@ typedef /*long*/ double real;
 	   ferrying long doubles to Mathematica is of course
 	   quite another matter, too. */
 
-typedef const real creal;
+typedef const real ctreal;
 
 
 #ifdef UNDERSCORE
@@ -137,24 +160,24 @@ typedef const real creal;
 #define EXPORT_(s) SUFFIX(s)
 
 
-static inline real Sq(creal x)
+static inline real Sq(ctreal x)
 {
   return x*x;
 }
 
-static inline real Min(creal a, creal b)
+static inline real Min(ctreal a, ctreal b)
 {
   return (a < b) ? a : b;
 }
 
-static inline real Max(creal a, creal b)
+static inline real Max(ctreal a, ctreal b)
 {
   return (a > b) ? a : b;
 }
 
-static inline real Weight(creal sum, creal sqsum, cnumber n)
+static inline real Weight(ctreal sum, ctreal sqsum, cnumber n)
 {
-  creal w = sqrt(sqsum*n);
+  ctreal w = sqrt(sqsum*n);
   return (n - 1)/Max((w + sum)*(w - sum), NOTZERO);
 }
 
@@ -179,5 +202,6 @@ static inline real Weight(creal sum, creal sqsum, cnumber n)
 
 /* abs(a) + (a == 0) */
 #define Abs1(a) (((a) ^ NegQ(a)) - NegQ((a) - 1))
+
 
 #endif

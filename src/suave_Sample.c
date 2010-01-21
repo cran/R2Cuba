@@ -1,6 +1,3 @@
-#ifndef __suave_sample_h__
-#define __suave_sample_h__
-//Compilation note for R interface: move into a .h
 /*
 	Sample.c
 		the sampling step of Suave
@@ -9,6 +6,12 @@
 */
 
 // To rescale into the user unit
+
+#include "suave_decl.h"
+#include "suave_util.h"
+extern void GetRandom(real *x, count ndim);
+extern void suaveDoSample(number n, ctreal *w, ctreal *x, real *f);
+
 #define RESCALE(a, d) (a * (upper_[d] - lower_[d]) + lower_[d])
 
 typedef struct {
@@ -19,10 +22,10 @@ typedef struct {
 
 /*********************************************************************/
 
-static void Sample(cnumber nnew, void *voidregion,
+ void suaveSample(cnumber nnew, void *voidregion,
   real *lastw, real *lastx, real *lastf, cint flags)
 {
-  TYPEDEFREGION;
+  SUAVETYPEDEFREGION;
 
   Region *const region = (Region *)voidregion;
   count comp, dim, df;
@@ -31,21 +34,22 @@ static void Sample(cnumber nnew, void *voidregion,
   char **ss=NULL, *s="";
   ccount chars = 128*(region->div + 1);
 
-  creal jacobian = 1/ldexp((real)nnew, region->div);
+  ctreal jacobian = 1/ldexp((real)nnew, region->div);
   real *w = lastw, *f = lastx;
   bin_t *bin = (bin_t *)(lastf + nnew*ncomp_);
+
 
   for( n = nnew; n; --n ) {
     real weight = jacobian;
 
-    GetRandom(f);
+    GetRandom(f, ndim_);
 
     for( dim = 0; dim < ndim_; ++dim ) {
       cBounds *b = &region->bounds[dim];
-      creal pos = *f*NBINS;
+      ctreal pos = *f*NBINS;
       ccount ipos = (count)pos;
-      creal prev = (ipos == 0) ? 0 : b->grid[ipos - 1];
-      creal diff = b->grid[ipos] - prev;
+      ctreal prev = (ipos == 0) ? 0 : b->grid[ipos - 1];
+      ctreal diff = b->grid[ipos] - prev;
       *f++ = b->lower + (prev + (pos - ipos)*diff)*(b->upper - b->lower);
       *bin++ = ipos;
       weight *= diff*NBINS;
@@ -54,7 +58,7 @@ static void Sample(cnumber nnew, void *voidregion,
     *w++ = weight;
   }
 
-  DoSample(nnew, lastw, lastx, lastf);
+  suaveDoSample(nnew, lastw, lastx, lastf);
 
   *(w - 1) = -*(w - 1);
   lastw = w;
@@ -77,24 +81,24 @@ static void Sample(cnumber nnew, void *voidregion,
 
   while( w < lastw ) {
     cbool final = (*w < 0);
-    creal weight = fabs(*w++);
+    ctreal weight = fabs(*w++);
     ++n;
 
     for( comp = 0; comp < ncomp_; ++comp ) {
       Cumulants *c = &cumul[comp];
 
-      creal wfun = weight*(*f++);
+      ctreal wfun = weight*(*f++);
       c->sum += wfun;
       c->sqsum += Sq(wfun);
 
       if( final ) {
         if( n > 1 ) {
-          real w = Weight(c->sum, c->sqsum, n);
-          c->weightsum += c->weight = w;
-          c->avgsum += c->avg = w*c->sum;
+          real wi = Weight(c->sum, c->sqsum, n);
+          c->weightsum += c->weight = wi;
+          c->avgsum += c->avg = wi*c->sum;
 
           if( VERBOSE > 2 ) {
-            creal sig = sqrt(1/w);
+            ctreal sig = sqrt(1/wi);
             ss[comp] += (df == 0) ?
               sprintf(ss[comp], "\n[" COUNT "] "
                 REEL " +- " REEL " (" NUMBER ")", comp + 1,
@@ -106,8 +110,8 @@ static void Sample(cnumber nnew, void *voidregion,
 
           if( df == 0 ) c->guess = c->sum;
           else {
-            c->chisum += w *= c->sum - c->guess;
-            c->chisqsum += w*c->sum;
+            c->chisum += wi *= c->sum - c->guess;
+            c->chisqsum += wi*c->sum;
           }
         }
 
@@ -123,8 +127,8 @@ static void Sample(cnumber nnew, void *voidregion,
   for( comp = 0; comp < ncomp_; ++comp ) {
     Result *r = &region->result[comp];
     Cumulants *c = &cumul[comp];
-    creal sigsq = 1/c->weightsum;
-    creal avg = sigsq*c->avgsum;
+    ctreal sigsq = 1/c->weightsum;
+    ctreal avg = sigsq*c->avgsum;
 
     if( LAST ) {
       r->sigsq = 1/c->weight;
@@ -174,4 +178,4 @@ static void Sample(cnumber nnew, void *voidregion,
   }
 }
 
-#endif
+

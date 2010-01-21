@@ -1,17 +1,30 @@
-//Compilation note for R interface: move into a .h
-//Compilation note for R interface: add ifndef
-#ifndef __vegas_integrate_h__
-#define __vegas_integrate_h__
 
-////Compilation note for R interface: add decodflags
-extern
-void decodflags(cint flags, 
+#include "common_ChiSquare.h"
+#include "vegas_decl.h"
+#include "vegas_util.h"
+
+extern void IniRandom(cnumber n, cint flags, count ndim);
+extern void GetRandom(real *x, count ndim);
+extern  void SkipRandom(cnumber n, count ndim);
+extern void PutGrid(Grid *grid);
+  extern void GetGrid(Grid *grid);
+  extern void vegasRefineGrid(Grid grid, Grid margsum, cint flags);
+extern void vegasDoSample(number n, ctreal *w, ctreal *x,
+			  ctreal *lower, ctreal *upper, ctreal prdbounds, real *f);
+
+extern void decodflags(cint flags, 
 		int *smooth,
 		int *pseudorandom,
 		int *final,
 		int *verbose);
 
+extern char EXPORT(vegasstate)[MAXSTATESIZE];
+extern  int EXPORT(vegasnbatch);
+extern   int EXPORT(vegasgridno);
+
+
 #include <R_ext/Utils.h> // to allow interruptions
+
 /*
 	Integrate.c
 		integrate over the unit hypercube
@@ -20,11 +33,12 @@ void decodflags(cint flags,
 */
 
 
-static int Integrate(  creal *lower, creal *upper, creal prdbounds,
-		       creal epsrel, creal epsabs,
+/************************************************************* */
+ int vegasIntegrate(  ctreal *lower, ctreal *upper, ctreal prdbounds,
+		       ctreal epsrel, ctreal epsabs,
   cint flags, cnumber mineval, cnumber maxeval,
   cnumber nstart, cnumber nincrease,
-  real *integral, real *error, real *prob)
+  real *integral, real *erreur, real *prob)
 {
   real *sample;
   count dim, comp;
@@ -32,8 +46,8 @@ static int Integrate(  creal *lower, creal *upper, creal prdbounds,
   struct {
     count niter;
     number nsamples, neval;
-    Cumulants cumul[NCOMP];
-    Grid grid[NDIM];
+    Cumulants cumul[MAXNCOMP];
+    Grid grid[MAXNDIM];
   } state;
   int statemsg = VERBOSE;
   struct stat st;
@@ -64,14 +78,14 @@ static int Integrate(  creal *lower, creal *upper, creal prdbounds,
   if( setjmp(abort_) ) goto abort;
 #endif
 
-  IniRandom(2*maxeval, flags);
+  IniRandom(2*maxeval, flags, ndim_);
 
   if( *EXPORT(vegasstate) && stat(EXPORT(vegasstate), &st) == 0 &&
       st.st_size == sizeof(state) && (st.st_mode & 0400) ) {
     cint h = open(EXPORT(vegasstate), O_RDONLY);
     read(h, &state, sizeof(state));
     close(h);
-    SkipRandom(neval_ = state.neval);
+    SkipRandom(neval_ = state.neval, ndim_);
 
     if( VERBOSE ) {
       char s[256];
@@ -93,7 +107,7 @@ static int Integrate(  creal *lower, creal *upper, creal prdbounds,
   for( ; ; ) {
 R_CheckUserInterrupt(); // permettre a l'utilisateur d'interrompre
     number nsamples = state.nsamples;
-    creal jacobian = 1./nsamples;
+    ctreal jacobian = 1./nsamples;
     Grid margsum[NCOMP][NDIM];
 
     Zap(margsum);
@@ -109,13 +123,13 @@ R_CheckUserInterrupt(); // permettre a l'utilisateur d'interrompre
       while( x < f ) {
         real weight = jacobian;
 
-        GetRandom(x);
+        GetRandom(x, ndim_);
 
         for( dim = 0; dim < ndim_; ++dim ) {
-          creal pos = *x*NBINS;
+          ctreal pos = *x*NBINS;
           ccount ipos = (count)pos;
-          creal prev = (ipos == 0) ? 0 : state.grid[dim][ipos - 1];
-          creal diff = state.grid[dim][ipos] - prev; 
+          ctreal prev = (ipos == 0) ? 0 : state.grid[dim][ipos - 1];
+          ctreal diff = state.grid[dim][ipos] - prev; 
           *x++ = prev + (pos - ipos)*diff;
           *bin++ = ipos;
           weight *= diff*NBINS;
@@ -124,13 +138,13 @@ R_CheckUserInterrupt(); // permettre a l'utilisateur d'interrompre
         *w++ = weight;
       }
 
-      DoSample(nbatch, sample, w, lower, upper, prdbounds, f);
+      vegasDoSample(nbatch, sample, w, lower, upper, prdbounds, f);
 
       w = sample;
       bin = (bin_t *)lastf;
 
       while( f < lastf ) {
-        creal weight = *w++;
+        ctreal weight = *w++;
 
         for( comp = 0; comp < ncomp_; ++comp ) {
           real wfun = weight*(*f++);
@@ -201,7 +215,7 @@ R_CheckUserInterrupt(); // permettre a l'utilisateur d'interrompre
 
     if( ncomp_ == 1 )
       for( dim = 0; dim < ndim_; ++dim )
-        RefineGrid(state.grid[dim], margsum[0][dim], flags);
+        vegasRefineGrid(state.grid[dim], margsum[0][dim], flags);
     else {
       for( dim = 0; dim < ndim_; ++dim ) {
         Grid wmargsum;
@@ -209,14 +223,14 @@ R_CheckUserInterrupt(); // permettre a l'utilisateur d'interrompre
         for( comp = 0; comp < ncomp_; ++comp ) {
           real w = state.cumul[comp].avg;
           if( w != 0 ) {
-            creal *m = margsum[comp][dim];
+            ctreal *m = margsum[comp][dim];
             count bin;
             w = 1/Sq(w);
             for( bin = 0; bin < NBINS; ++bin )
               wmargsum[bin] += w*m[bin];
           }
         }
-        RefineGrid(state.grid[dim], wmargsum, flags);
+        vegasRefineGrid(state.grid[dim], wmargsum, flags);
       }
     }
 
@@ -244,7 +258,7 @@ R_CheckUserInterrupt(); // permettre a l'utilisateur d'interrompre
   for( comp = 0; comp < ncomp_; ++comp ) {
     cCumulants *c = &state.cumul[comp];
     integral[comp] = c->avg;
-    error[comp] = c->err;
+    erreur[comp] = c->err;
     prob[comp] = ChiSquare(c->chisq, state.niter);
   }
 
@@ -258,4 +272,3 @@ abort:
   return fail;
 }
 
-#endif

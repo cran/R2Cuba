@@ -10,7 +10,7 @@ suave <- function(ndim, ncomp,
                   nnew=1000, flatness= 50)
   {
      # Verification
- if (!verif(ndim, lower, upper, rel.tol, abs.tol,
+ if (!verif(ndim, ncomp, lower, upper, rel.tol, abs.tol,
             flags, min.eval,  max.eval))
       stop("Error in input: see the warnings")
 

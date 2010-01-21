@@ -45,14 +45,14 @@ typedef struct {
 typedef const Rule cRule;
 
 
-#define TYPEDEFREGION \
+#define CUHRETYPEDEFREGION \
   typedef struct region { \
     count div; \
-    Result result[NCOMP]; \
-    Bounds bounds[NDIM]; \
+    Result result[MAXNCOMP]; \
+    Bounds bounds[MAXNDIM]; \
   } Region
 
 
-typedef void (*Integrand)(ccount *, creal *, ccount *, creal *lower, creal *upper, creal prdbounds, real *);
+typedef void (*Integrand)(ccount *, ctreal *, ccount *, ctreal *lower, ctreal *upper, ctreal prdbounds, real *);
 
 #endif

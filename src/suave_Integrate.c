@@ -1,7 +1,6 @@
-#ifndef __suave_integrate_h__
-#define __suave_integrate_h__
+#include "suave_util.h"
+#include "suave_Fluct.h"
 
- //Compilation note for R interface: move into a .h
 /*
 	Integrate.c
 		integrate over the unit hypercube
@@ -9,23 +8,32 @@
 		last modified 2 Jan 08 th
 */
 
+#include "common_ChiSquare.h"
+extern void IniRandom(cnumber n, cint flags, count ndim);
+extern void suaveSample(cnumber nnew, void *voidregion,
+			real *lastw, real *lastx, real *lastf, cint flags);
 
-//Compilation note for R interface:  add decodflags
-extern
-void decodflags(cint flags, 
+extern void Reweight(Bounds *b,
+		     ctreal *w, ctreal *f, ctreal *lastf, cResult *total, cint flags);
+extern void StretchGrid(cGrid grid, Grid gridL, Grid gridR);
+
+
+
+
+extern void decodflags(cint flags, 
 		int *smooth,
 		int *pseudorandom,
 		int *final,
 		int *verbose);
 
 
-
-static int Integrate(  creal epsrel, creal epsabs,
+/* ****************************************************** */
+ int suaveIntegrate(  ctreal epsrel, ctreal epsabs,
   cint flags, cnumber mineval, cnumber maxeval,
-  cnumber nnew, creal flatness,
-  real *integral, real *error, real *prob)
+  cnumber nnew, ctreal flatness,
+  real *integral, real *erreur, real *prob)
 {
-  TYPEDEFREGION;
+  SUAVETYPEDEFREGION;
 
   count dim, comp, df;
   int fail = 1;
@@ -56,7 +64,7 @@ static int Integrate(  creal epsrel, creal epsabs,
   if( setjmp(abort_) ) goto abort;
 #endif
 
-  IniRandom(2*maxeval, flags);
+  IniRandom(2*maxeval, flags, ndim_);
 
   RegionAlloc(anchor, nnew, nnew);
   anchor->next = NULL;
@@ -77,7 +85,7 @@ static int Integrate(  creal epsrel, creal epsabs,
     else Copy(b->grid, anchor->bounds[0].grid, NBINS);
   }
 
-  Sample(nnew, anchor, anchor->w,
+  suaveSample(nnew, anchor, anchor->w,
     anchor->w + nnew, anchor->w + (ndim_ + 1)*nnew, flags);
   df = anchor->df;
   ResCopy(totals, anchor->result);
@@ -111,7 +119,7 @@ static int Integrate(  creal epsrel, creal epsabs,
     maxratio = -INFTY;
     maxcomp = 0;
     for( comp = 0; comp < ncomp_; ++comp ) {
-      creal ratio = totals[comp].err/MaxErr(totals[comp].avg);
+      ctreal ratio = totals[comp].err/MaxErr(totals[comp].avg);
       if( ratio > maxratio ) {
         maxratio = ratio;
         maxcomp = comp;
@@ -129,7 +137,7 @@ static int Integrate(  creal epsrel, creal epsabs,
     parent = &anchor;
     region = anchor;
     for( par = &anchor; (reg = *par); par = &reg->next ) {
-      creal err = reg->result[maxcomp].err;
+      ctreal err = reg->result[maxcomp].err;
       if( err > maxerr ) {
         maxerr = err;
         parent = par;
@@ -147,7 +155,7 @@ static int Integrate(  creal epsrel, creal epsabs,
     bisectdim = 0;
     for( dim = 0; dim < ndim_; ++dim ) {
       cBounds *b = &region->bounds[dim];
-      creal fluct = (var[dim][0].fluct + var[dim][1].fluct)*
+      ctreal fluct = (var[dim][0].fluct + var[dim][1].fluct)*
         (bias - b->upper + b->lower);
       if( fluct < minfluct ) {
         minfluct = fluct;
@@ -213,8 +221,8 @@ static int Integrate(  creal epsrel, creal epsabs,
 
     StretchGrid(bounds->grid, boundsL->grid, boundsR->grid);
 
-    Sample(nnewL, regionL, wL, xL, fL, flags);
-    Sample(nnewR, regionR, wR, xR, fR, flags);
+    suaveSample(nnewL, regionL, wL, xL, fL, flags);
+    suaveSample(nnewR, regionR, wR, xR, fR, flags);
 
     df += regionL->df + regionR->df - region->df;
 
@@ -230,7 +238,7 @@ static int Integrate(  creal epsrel, creal epsabs,
       diff = Sq(.25*diff);
       sigsq = rL->sigsq + rR->sigsq;
       if( sigsq > 0 ) {
-        creal c = Sq(1 + sqrt(diff/sigsq));
+        ctreal c = Sq(1 + sqrt(diff/sigsq));
         rL->sigsq *= c;
         rR->sigsq *= c;
       }
@@ -250,7 +258,7 @@ static int Integrate(  creal epsrel, creal epsabs,
   for( comp = 0; comp < ncomp_; ++comp ) {
     cResult *tot = &totals[comp];
     integral[comp] = tot->avg;
-    error[comp] = tot->err;
+    erreur[comp] = tot->err;
     prob[comp] = ChiSquare(tot->chisq, df);
   }
 
@@ -297,4 +305,3 @@ abort:
   return fail;
 }
 
-#endif

@@ -9,9 +9,13 @@
 
 
 #include "suave_decl.h"
+/* globals */
+ real *lower_, *upper_,  prdbounds_;
+ count ndim_, ncomp_, nregions_;
+  number neval_;
+  Integrand integrand_;
 
-static count ndim_, ncomp_, nregions_;
-static number neval_;
+
 
 
 #define RegionAlloc(p, n, nnew) \

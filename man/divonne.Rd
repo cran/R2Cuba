@@ -187,7 +187,7 @@ divonne(NDIM, NCOMP, integrand, rel.tol=1e-3,  abs.tol=1e-12,
 NMAX <- 4
 
 peakf <- function(bounds) {
-  print(bounds) # matrix (ndim,2)
+#  print(bounds) # matrix (ndim,2)
   x <- matrix(0, ncol=NMAX, nrow=NDIM)
    pas <- 1/(NMAX-1)
    # 1ier point

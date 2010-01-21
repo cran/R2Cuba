@@ -7,23 +7,27 @@
 		last modified 2 Mar 06 th
 */
 
+#include "common_stddecl.h"
 #include "divonne_util.h"
-/* Compilation note for R interface: add inclR.h */
-#include "inclR.h"
-/* Compilation note for R interface: modif #define Print(s) puts(s); fflush(stdout) */
-#define Print(s) Rprintf(s)
+#include "struct_Random.h"
 
-static Integrand integrand_;
-static PeakFinder peakfinder_;
+#include "inclR.h"
+extern bool divonneBadDimension(ccount ndim, cint flags, ccount key);
+  extern bool divonneBadComponent(cint ncomp);
+extern void divonneDoSample(number n, ccount ldx, ctreal *x,real *f);
+extern int divonneIntegrate(ctreal epsrel, ctreal epsabs,
+  cint flags, cnumber mineval, cnumber maxeval,
+  int key1, int key2, int key3, ccount maxpass, 
+  ctreal maxchisq, ctreal mindeviation,
+			    real *integral, real *erreur, real *prob);
+
 /*********************************************************************/
 /* Compilation note for R interface: 
    The integration R function and its execution environnement */
 /*********************************************************************/
-SEXP rho, f, peakf;		
+SEXP rho, globf, peakf;		
 
-/*Compilation note for R interface: 
-  global, to be used by Rpeakf, DoSample and SampleExtra*/
-real *lower_, *upper_,  prdbounds_;
+
 /* verif_: to verify the dimensions of the structures returned by
    the user functions: only used at the first call */
 bool verif_; 
@@ -31,9 +35,9 @@ bool verif_;
 /*********************************************************************/
 /*  The function RIntegrand calls the R user function */
 /*********************************************************************/
-static void RIntegrand(ccount *ndim, creal xx[],
+static void RIntegrand(ccount *ndim, ctreal xx[],
 		       ccount  *ncomp, 
-		       creal *lower, creal *upper, creal prdbounds,
+		       ctreal *lower, ctreal *upper, ctreal prdbounds,
 		       real ff[],
 		       cint *phase)
 {
@@ -54,7 +58,7 @@ PROTECT(argphase=allocVector(REALSXP, (1 )));
   /* Call the R function */
 PROTECT(t = s = allocList(3));
          SET_TYPEOF(s, LANGSXP);
-         SETCAR(t, f); t = CDR(t);
+         SETCAR(t, globf); t = CDR(t);
          SETCAR(t,  args); t = CDR(t);
          SETCAR(t, argphase); 
 
@@ -174,50 +178,26 @@ PROTECT(dimnames = allocVector(VECSXP, 2));
 
 /*********************************************************************/
 
-static inline void DoSample(number n, ccount ldx, creal *x,real *f)
-{
-  neval_ += n;
 
-  while( n-- ) {
-    integrand_(&ndim_, x, &ncomp_,   lower_, upper_, prdbounds_,
-            f, &phase_);
-    x += ldx;
-    f += ncomp_;
-  }
-}
-
-/*********************************************************************/
-
-static inline count SampleExtra( cBounds *b)
-{
-  number n = nextra_;
-  peakfinder_(&ndim_, b, &n, xextra_);
-  DoSample(n, ldxgiven_, xextra_, fextra_);
-  return n;
-}
-
-/*********************************************************************/
-
-#include "divonne_common.h"
-Extern void EXPORT(Divonne)(ccount ndim, ccount ncomp,
+ void EXPORT(Divonne)(ccount ndim, ccount ncomp,
   Integrand integrand,
-  creal epsrel, creal epsabs,
+  ctreal epsrel, ctreal epsabs,
   cint flags, cnumber mineval, cnumber maxeval,
   cint key1, cint key2, cint key3, ccount maxpass,
-  creal border, creal maxchisq, creal mindeviation,
+  ctreal border, ctreal maxchisq, ctreal mindeviation,
   cnumber ngiven, ccount ldxgiven, real *xgiven,
   cnumber nextra, PeakFinder peakfinder,
   int *pnregions, number *pneval, int *pfail,
-  real *integral, real *error, real *prob)
+  real *integral, real *erreur, real *prob)
 {
 
   ndim_ = ndim;
   ncomp_ = ncomp;
 
-  if( BadComponent(ncomp) ||
-      BadDimension(ndim, flags, key1) ||
-      BadDimension(ndim, flags, key2) ||
-      ((key3 & -2) && BadDimension(ndim, flags, key3)) ) *pfail = -1;
+  if( divonneBadComponent(ncomp) ||
+      divonneBadDimension(ndim, flags, key1) ||
+      divonneBadDimension(ndim, flags, key2) ||
+      ((key3 & -2) && divonneBadDimension(ndim, flags, key3)) ) *pfail = -1;
   else {
     neval_ = neval_opt_ = neval_cut_ = 0;
     integrand_ = integrand;
@@ -243,14 +223,14 @@ Extern void EXPORT(Divonne)(ccount ndim, ccount ncomp,
       if( nxgiven ) {
         phase_ = 0;
         Copy(xgiven_, xgiven, nxgiven);
-        DoSample(ngiven_, ldxgiven_, xgiven_, fgiven_);
+        divonneDoSample(ngiven_, ldxgiven_, xgiven_, fgiven_);
       }
     }
 
-    *pfail = Integrate( epsrel, Max(epsabs, NOTZERO),
+    *pfail = divonneIntegrate( epsrel, Max(epsabs, NOTZERO),
       flags, mineval, maxeval, key1, key2, key3, maxpass,
       maxchisq, mindeviation,
-      integral, error, prob);
+      integral, erreur, prob);
 
     *pnregions = nregions_;
     *pneval = neval_;
@@ -262,14 +242,14 @@ Extern void EXPORT(Divonne)(ccount ndim, ccount ncomp,
 /*********************************************************************/
 void (divonne)(ccount *pndim, ccount *pncomp,
   Integrand integrand,
- creal *pepsrel, creal *pepsabs,
+ ctreal *pepsrel, ctreal *pepsabs,
   cint *pflags, cnumber *pmineval, cnumber *pmaxeval,
   cint *pkey1, cint *pkey2, cint *pkey3, ccount *pmaxpass,
-  creal *pborder, creal *pmaxchisq, creal *pmindeviation,
+  ctreal *pborder, ctreal *pmaxchisq, ctreal *pmindeviation,
   cnumber *pngiven, ccount *pldxgiven, real *xgiven,
   cnumber *pnextra, PeakFinder peakfinder,
   int *pnregions, number *pneval, int *pfail,
-  real *integral, real *error, real *prob)
+  real *integral, real *erreur, real *prob)
 {
 
   EXPORT(Divonne)(*pndim, *pncomp,
@@ -281,7 +261,7 @@ void (divonne)(ccount *pndim, ccount *pncomp,
     *pngiven, *pldxgiven, xgiven,
     *pnextra, peakfinder,
     pnregions, pneval, pfail,
-    integral, error, prob);
+    integral, erreur, prob);
 }
 
 /*********************************************************************/
@@ -301,13 +281,13 @@ double *pmaxchisq, double *pmindeviation,
   int *pngiven, int *pldxgiven, double *xgiven,
 	      int *pnextra, void ** peakfinder,
   int *pnregions, int *pneval, int *pfail,
-  double *integral, double *error, double *prob)
+  double *integral, double *erreur, double *prob)
 {
 
 
   /* store the R function and its environment  into a global*/
   rho= (SEXP)(env);
-  f= (SEXP)(integrand);
+  globf= (SEXP)(integrand);
   peakf = (SEXP)peakfinder;
   lower_ = lower;
   upper_ = upper;
@@ -322,15 +302,15 @@ double *pmaxchisq, double *pmindeviation,
 
   divonne((ccount *)pndim, (ccount *)pncomp,
 	(Integrand)RIntegrand,
-(creal *)pepsrel, (creal *)pepsabs,
+(ctreal *)pepsrel, (ctreal *)pepsabs,
 	(cint *)pflags, (cnumber *)pmineval, (cnumber *)pmaxeval,
  (cint *)key1, (cint *)key2, (cint *)key3, 
 (ccount *)maxpass,
-  (creal *)border, (creal *)pmaxchisq, (creal *)pmindeviation,
+  (ctreal *)border, (ctreal *)pmaxchisq, (ctreal *)pmindeviation,
 	  (cnumber *)pngiven, (ccount *)pldxgiven, (double *)xgiven,
 	  (cnumber *)pnextra, (PeakFinder) Rpeakf,
 	(count *) pnregions,
 	(number *)pneval, (int *)pfail,
-	(real *)integral, (real *)error, (real *)prob);
+	(real *)integral, (real *)erreur, (real *)prob);
 
 } // End Rdivonne

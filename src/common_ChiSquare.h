@@ -17,14 +17,14 @@
 #include "common_Erf.h"
 #endif
 
-static inline real Normal(creal x)
+ static inline  real Normal(ctreal x)
 {
   return .5*Erf(x/1.414213562373095048801689) + .5;
 }
 
 /*********************************************************************/
 
-static real ChiSquare(creal x, cint df)
+static  real ChiSquare(ctreal x, cint df)
 {
   real y;
 
@@ -45,7 +45,7 @@ static real ChiSquare(creal x, cint df)
   y = .5*x;
 
   if( df & 1 ) {
-    creal sqrty = sqrt(y);
+    ctreal sqrty = sqrt(y);
     real h = Erf(sqrty);
     count i;
 

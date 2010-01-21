@@ -1,6 +1,3 @@
-#ifndef __divonne_findminimum_h__
-#define __divonne_findminimum_h__
-//Compilation note for R interface: move into a .h
 /*
 	FindMinimum.c
 		find minimum (maximum) of hyperrectangular region
@@ -8,8 +5,10 @@
 		last modified 7 Mar 05 th
 */
 
+#include "divonne_util.h"
+extern real divonneSample(ctreal *x0);
 
-#define EPS 0x1p-52
+#define EPS 0x1p-52 // pow(2, -52)
 #define RTEPS 0x1p-26
 #define QEPS 0x1p-13
 
@@ -37,14 +36,14 @@ typedef struct { real dx, f; } Point;
 
 /*********************************************************************/
 
-static inline real SignSample(real *x)
+  real SignSample(real *x)
 {
-  return sign_*Sample(x);
+  return sign_*divonneSample(x);
 }
 
 /*********************************************************************/
 
-static inline real Dot(ccount n, creal *a, creal *b)
+  real Dot(ccount n, ctreal *a, ctreal *b)
 {
   real sum = 0;
   count i;
@@ -54,15 +53,15 @@ static inline real Dot(ccount n, creal *a, creal *b)
 
 /*********************************************************************/
 
-static inline real Length(ccount n, creal *vec)
+  real Length(ccount n, ctreal *vec)
 {
   return sqrt(Dot(n, vec, vec));
 }
 
 /*********************************************************************/
 
-static inline void LinearSolve(ccount n, creal *hessian,
-  creal *grad, real *p)
+  void LinearSolve(ccount n, ctreal *hessian,
+  ctreal *grad, real *p)
 {
   int i, j;
   real dir;
@@ -85,29 +84,29 @@ static inline void LinearSolve(ccount n, creal *hessian,
 
 /*********************************************************************/
 
-static void RenormalizeCholesky(ccount n, real *hessian,
+ void RenormalizeCholesky(ccount n, real *hessian,
   real *z, real alpha)
 {
   count i, j;
 
   for( i = 0; i < n; ++i ) {
-    creal dir = z[i];
+    ctreal dir = z[i];
     real beta = alpha*dir;
-    real gamma = Hessian(i, i);
+    real gammaiii = Hessian(i, i);
     real gammanew = Hessian(i, i) += beta*dir;
 
     if( i + 1 >= n || gammanew < 0 ||
-        (gammanew < 1 && gamma > DBL_MAX*gammanew) ) return;
+        (gammanew < 1 && gammaiii > DBL_MAX*gammanew) ) return;
 
-    gamma /= gammanew;
+    gammaiii /= gammanew;
     beta /= gammanew;
-    alpha *= gamma;
+    alpha *= gammaiii;
 
-    if( gamma < .25 ) {
+    if( gammaiii < .25 ) {
       for( j = i + 1; j < n; ++j ) {
         real delta = beta*z[j];
         z[j] -= dir*Hessian(j, i);
-        Hessian(j, i) = Hessian(j, i)*gamma + delta;
+        Hessian(j, i) = Hessian(j, i)*gammaiii + delta;
       }
     }
     else {
@@ -120,31 +119,33 @@ static void RenormalizeCholesky(ccount n, real *hessian,
 }
 
 /*********************************************************************/
-
-static void UpdateCholesky(ccount n, real *hessian,
+void UpdateCholesky(ccount n, real *hessian,
   real *z, real *p)
 {
   int i, j;
-  real gamma = 0;
+  real gammaiii = 0, toto;
 
   for( i = 0; i < n; ++i ) {
     real dir = z[i];
     for( j = 0; j < i; ++j )
       dir -= Hessian(i, j)*p[j];
     p[i] = dir;
-    gamma += Sq(dir)/Hessian(i, i);
+    gammaiii += Sq(dir)/Hessian(i, i);
   }
-  gamma = Max(fabs(1 - gamma), EPS);
+  /* AB: genuine  gammaiii = Max(fabs(1 - gammaiii), EPS);
+     to avoid double computation */
+  toto=fabs(1 - gammaiii);
+  gammaiii = Max(toto, EPS);
 
   while( --i >= 0 ) {
-    creal dir = z[i] = p[i];
+    ctreal dir = z[i] = p[i];
     real beta = dir/Hessian(i, i);
-    creal gammanew = gamma + dir*beta;
-    Hessian(i, i) *= gamma/gammanew;
-    beta /= gamma;
-    gamma = gammanew;
+    ctreal gammanew = gammaiii + dir*beta;
+    Hessian(i, i) *= gammaiii/gammanew;
+    beta /= gammaiii;
+    gammaiii = gammanew;
     for( j = i + 1; j < n; ++j ) {
-      creal delta = beta*z[j];
+      ctreal delta = beta*z[j];
       z[j] += dir*Hessian(j, i);
       Hessian(j, i) -= delta;
     }
@@ -153,8 +154,8 @@ static void UpdateCholesky(ccount n, real *hessian,
 
 /*********************************************************************/
 
-static inline void BFGS(ccount n, real *hessian,
-  creal *gnew, creal *g, real *p, creal dx)
+   void BFGS(ccount n, real *hessian,
+  ctreal *gnew, ctreal *g, real *p, ctreal dx)
 {
   real y[NDIM], c;
   count i, j;
@@ -179,15 +180,15 @@ static inline void BFGS(ccount n, real *hessian,
 
 /*********************************************************************/
 
-static void Gradient(ccount nfree, ccount *ifree,
-  cBounds *b, real *x, creal y, real *grad)
+ void Gradient(ccount nfree, ccount *ifree,
+  cBounds *b, real *x, ctreal y, real *grad)
 {
   count i;
 
   for( i = 0; i < nfree; ++i ) {
     ccount dim = Untag(ifree[i]);
-    creal xd = x[dim];
-    creal delta = (b[dim].upper - xd < DELTA) ? -DELTA : DELTA;
+    ctreal xd = x[dim];
+    ctreal delta = (b[dim].upper - xd < DELTA) ? -DELTA : DELTA;
     x[dim] += delta;
     grad[i] = (SignSample(x) - y)/delta;
     x[dim] = xd;
@@ -196,10 +197,10 @@ static void Gradient(ccount nfree, ccount *ifree,
 
 /*********************************************************************/
 
-static Point LineSearch(ccount nfree, ccount *ifree,
-  creal *p, creal *xini, real fini, real *x,
-  real step, creal range, creal grad,
-  creal ftol, creal xtol, creal gtol)
+ Point LineSearch(ccount nfree, ccount *ifree,
+  ctreal *p, ctreal *xini, real fini, real *x,
+  real step, ctreal range, ctreal grad,
+  ctreal ftol, ctreal xtol, ctreal gtol)
 {
   real tol = ftol, tol2 = tol + tol;
   Point cur = {0, fini};
@@ -212,8 +213,8 @@ static Point LineSearch(ccount nfree, ccount *ifree,
      c) the gradient is positive, i.e. we'd move uphill */
 
   if( step > 0 && range > tol2 && grad <= 0 ) {
-    creal eps = RTEPS*fabs(range) + ftol;
-    creal mingrad = -1e-4*grad, maxgrad = -gtol*grad;
+    ctreal eps = RTEPS*fabs(range) + ftol;
+    ctreal mingrad = -1e-4*grad, maxgrad = -gtol*grad;
 
     real end = range + eps;
     real maxstep = range - eps/(1 + RTEPS);
@@ -282,14 +283,14 @@ static Point LineSearch(ccount nfree, ccount *ifree,
       r = q = s = 0;
       if( fabs(end) > tol ) {
         if( first ) {
-          creal s1 = w.dx*grad;
-          creal s2 = w.f - min.f;
+          ctreal s1 = w.dx*grad;
+          ctreal s2 = w.f - min.f;
           s = (s1 - ((distmin == 0) ? 0 : 2*s2))*w.dx;
           q = 2*(s2 - s1);
         }
         else {
-          creal s1 = w.dx*(v.f - min.f);
-          creal s2 = v.dx*(w.f - min.f);
+          ctreal s1 = w.dx*(v.f - min.f);
+          ctreal s2 = v.dx*(w.f - min.f);
           s = s1*w.dx - s2*v.dx;
           q = 2*(s2 - s1);
         }
@@ -351,8 +352,8 @@ static Point LineSearch(ccount nfree, ccount *ifree,
 
 /*********************************************************************/
 
-static real LocalSearch(ccount nfree, ccount *ifree, cBounds *b,
-  creal *x, creal fx, real *z)
+ real LocalSearch(ccount nfree, ccount *ifree, cBounds *b,
+  ctreal *x, ctreal fx, real *z)
 {
   real delta, smax, sopp, spmax, snmax;
   real y[NDIM], fy, fz, ftest;
@@ -367,8 +368,8 @@ static real LocalSearch(ccount nfree, ccount *ifree, cBounds *b,
   smax = INFTY;
   for( i = 0; i < nfree; ++i ) {
     ccount dim = ifree[i];
-    creal sp = b[dim].upper - x[dim];
-    creal sn = x[dim] - b[dim].lower;
+    ctreal sp = b[dim].upper - x[dim];
+    ctreal sn = x[dim] - b[dim].lower;
     if( sp < sn ) {
       smax = Min(smax, sn);
       p[i] = -1;
@@ -483,8 +484,8 @@ static real LocalSearch(ccount nfree, ccount *ifree, cBounds *b,
       ccount dim = ifree[i];
       p[i] = z[dim] - x[dim];
       if( p[i] != 0 ) {
-        creal sp = (b[dim].upper - x[dim])/p[i];
-        creal sn = (x[dim] - b[dim].lower)/p[i];
+        ctreal sp = (b[dim].upper - x[dim])/p[i];
+        ctreal sn = (x[dim] - b[dim].lower)/p[i];
         if( p[i] > 0 ) {
           spmax = Min(spmax, sp);
           snmax = Min(snmax, sn);
@@ -527,15 +528,16 @@ static real LocalSearch(ccount nfree, ccount *ifree, cBounds *b,
 
 /*********************************************************************/
 
-static real FindMinimum(cBounds *b, real *xmin, real fmin)
+ real FindMinimum(cBounds *b, real *xmin, real fminiii)
 {
   real hessian[NDIM*NDIM];
   real gfree[NDIM], p[NDIM];
-  real tmp[NDIM], ftmp, fini = fmin;
+  real tmp[NDIM], ftmp, fini = fminiii;
   ccount maxeval = neval_ + 50*ndim_;
   count nfree, nfix;
   count ifree[NDIM], ifix[NDIM];
   count dim, local;
+  bool resample;
 
   Zap(hessian);
   for( dim = 0; dim < ndim_; ++dim )
@@ -547,7 +549,7 @@ static real FindMinimum(cBounds *b, real *xmin, real fmin)
                w.r.t. the free dimensions, perform a local search. */
 
   for( local = 0; local < 2; ++local ) {
-    bool resample = false;
+     resample = false;
     nfree = nfix = 0;
     for( dim = 0; dim < ndim_; ++dim ) {
       if( xmin[dim] < b[dim].lower + (1 + fabs(b[dim].lower))*QEPS ) {
@@ -563,17 +565,17 @@ static real FindMinimum(cBounds *b, real *xmin, real fmin)
       else ifree[nfree++] = dim;
     }
 
-    if( resample ) fini = fmin = SignSample(xmin);
+    if( resample ) fini = fminiii = SignSample(xmin);
 
     if( nfree == 0 ) goto releasebounds;
 
-    Gradient(nfree, ifree, b, xmin, fmin, gfree);
+    Gradient(nfree, ifree, b, xmin, fminiii, gfree);
     if( local || Length(nfree, gfree) > GTOL ) break;
 
-    ftmp = LocalSearch(nfree, ifree, b, xmin, fmin, tmp);
-    if( ftmp > fmin - (1 + fabs(fmin))*RTEPS )
+    ftmp = LocalSearch(nfree, ifree, b, xmin, fminiii, tmp);
+    if( ftmp > fminiii - (1 + fabs(fminiii))*RTEPS )
       goto releasebounds;
-    fmin = ftmp;
+    fminiii = ftmp;
     VecCopy(xmin, tmp);
   }
 
@@ -594,17 +596,17 @@ static real FindMinimum(cBounds *b, real *xmin, real fmin)
 
       minstep = INFTY;
       for( i = 0; i < nfree; ++i ) {
-        count dim = Untag(ifree[i]);
+        count dimi = Untag(ifree[i]);
         if( fabs(p[i]) > EPS ) {
           real step;
           count fix;
           if( p[i] < 0 ) {
-            step = (b[dim].lower - xmin[dim])/p[i];
-            fix = dim;
+            step = (b[dimi].lower - xmin[dimi])/p[i];
+            fix = dimi;
           }
           else {
-            step = (b[dim].upper - xmin[dim])/p[i];
-            fix = Tag(dim);
+            step = (b[dimi].upper - xmin[dimi])/p[i];
+            fix = Tag(dimi);
           }
           if( step < minstep ) {
             minstep = step;
@@ -619,7 +621,7 @@ fixbound:
         ifix[nfix++] = minfix;
 
         if( mini < --nfree ) {
-          creal diag = Hessian(mini, mini);
+          ctreal diag = Hessian(mini, mini);
 
           Clear(tmp, mini);
           for( i = mini; i < nfree; ++i )
@@ -637,25 +639,25 @@ fixbound:
         continue;
       }
 
-      low = LineSearch(nfree, ifree, p, xmin, fmin, tmp,
+      low = LineSearch(nfree, ifree, p, xmin, fminiii, tmp,
         Min(minstep, 1.), Min(minstep, 100.), Dot(nfree, gfree, p),
         RTEPS/pleneps, DELTA/pleneps, .2);
 
       if( low.dx > 0 ) {
         real fdiff;
 
-        fmin = low.f;
+        fminiii = low.f;
         VecCopy(xmin, tmp);
 
-        Gradient(nfree, ifree, b, xmin, fmin, tmp);
+        Gradient(nfree, ifree, b, xmin, fminiii, tmp);
         BFGS(nfree, hessian, tmp, gfree, p, low.dx);
         VecCopy(gfree, tmp);
 
         if( fabs(low.dx - minstep) < QEPS*minstep ) goto fixbound;
 
-        fdiff = fini - fmin;
-        fini = fmin;
-        if( fdiff > (1 + fabs(fmin))*FTOL ||
+        fdiff = fini - fminiii;
+        fini = fminiii;
+        if( fdiff > (1 + fabs(fminiii))*FTOL ||
             low.dx*plen > (1 + Length(ndim_, xmin))*FTOL ) continue;
       }
     }
@@ -669,10 +671,10 @@ releasebounds:
       count i, mini = 0;
       bool repeat = false;
 
-      Gradient(nfix, ifix, b, xmin, fmin, tmp);
+      Gradient(nfix, ifix, b, xmin, fminiii, tmp);
 
       for( i = 0; i < nfix; ++i ) {
-        creal grad = TaggedQ(ifix[i]) ? -tmp[i] : tmp[i];
+        ctreal grad = TaggedQ(ifix[i]) ? -tmp[i] : tmp[i];
         if( grad < -RTEPS ) {
           repeat = true;
           if( grad < mingrad ) {
@@ -698,7 +700,6 @@ releasebounds:
     break;
   }
 
-  return fmin;
+  return fminiii;
 }
 
-#endif

@@ -6,27 +6,42 @@
 */
 
 
+#include "struct_Random.h"
 #include "vegas_util.h"
 //Compilation note for R interface: add inclR.h 
 #include "inclR.h"
+extern bool vegasBadDimension(cint ndim, cint flags);
+extern bool vegasBadComponent(cint ncomp);
+
+extern  int vegasIntegrate(  ctreal *lower, ctreal *upper, ctreal prdbounds,
+		       ctreal epsrel, ctreal epsabs,
+  cint flags, cnumber mineval, cnumber maxeval,
+  cnumber nstart, cnumber nincrease,
+		      real *integral, real *erreur, real *prob);
+
+/* Compilation note for R interface: remove
+ int EXPORT(vegasnbatch) = 1000;
+ int EXPORT(vegasgridno) = 0;*/
+ int EXPORT(vegasnbatch);
+ int EXPORT(vegasgridno);
+ char EXPORT(vegasstate)[MAXSTATESIZE] = "";
 
 /* Compilation note for R interface: modif #define Print(s) puts(s); fflush(stdout) */
 #define Print(s) Rprintf(s)
 
-static Integrand integrand_;
 /*********************************************************************/
 /* Compilation note for R interface: 
    The integration R function and its execution environnement */
 /*********************************************************************/
-SEXP rho, f;		
+SEXP rho, globf;		
 
 /*********************************************************************/
 /*  The function RIntegrand calls the R user function */
 /*********************************************************************/
-static void RIntegrand(ccount *ndim, creal  xx[],
+static void RIntegrand(ccount *ndim, ctreal  xx[],
 		       ccount *ncomp,
-		       creal *lower, creal *upper, creal prdbounds,
-		        real ff[], creal *weight)
+		       ctreal *lower, ctreal *upper, ctreal prdbounds,
+		        real ff[], ctreal *weight)
 {
   SEXP args, argw, s, t, resultsxp;
   int i;
@@ -45,7 +60,7 @@ PROTECT(argw=allocVector(REALSXP, (1 )));
   /* Call the R function */
  PROTECT(t = s = allocList(3));
          SET_TYPEOF(s, LANGSXP);
-         SETCAR(t, f); t = CDR(t);
+         SETCAR(t, globf); t = CDR(t);
          SETCAR(t,  args); t = CDR(t);
          SETCAR(t, argw);
 
@@ -65,46 +80,28 @@ if  (length(resultsxp) != *ncomp)
 /*********************************************************************/
 
 
-
-static inline void DoSample(number n, creal *w, creal *x,
- creal *lower, creal *upper, creal prdbounds, real *f)
-{
-  neval_ += n;
-  while( n-- ) {
-    integrand_(&ndim_, x, &ncomp_,  lower, upper, prdbounds, f, w++);
-    x += ndim_;
-    f += ncomp_;
-  }
-
-
-}
-
-/*********************************************************************/
-
-#include "vegas_common.h"
-
-Extern void EXPORT(Vegas)(ccount ndim, ccount ncomp,
+ void EXPORT(Vegas)(ccount ndim, ccount ncomp,
   Integrand integrand,
-  creal *lower, creal *upper, creal prdbounds,
-  creal epsrel, creal epsabs,
+  ctreal *lower, ctreal *upper, ctreal prdbounds,
+  ctreal epsrel, ctreal epsabs,
   cint flags, cnumber mineval, cnumber maxeval,
   cnumber nstart, cnumber nincrease,
   number *pneval, int *pfail,
-  real *integral, real *error, real *prob)
+  real *integral, real *erreur, real *prob)
 {
   ndim_ = ndim;
   ncomp_ = ncomp;
 R_CheckUserInterrupt(); // to allow user interruptions
 
-  if( BadComponent(ncomp) || BadDimension(ndim, flags) ) *pfail = -1;
+  if( vegasBadComponent(ncomp) || vegasBadDimension(ndim, flags) ) *pfail = -1;
   else {
     neval_ = 0;
     integrand_ = integrand;
 
-    *pfail = Integrate(lower, upper, prdbounds,
+    *pfail = vegasIntegrate(lower, upper, prdbounds,
 		       epsrel, epsabs,
       flags, mineval, maxeval, nstart, nincrease,
-      integral, error, prob);
+      integral, erreur, prob);
 
     *pneval = neval_;
   }
@@ -114,12 +111,12 @@ R_CheckUserInterrupt(); // to allow user interruptions
 
  void (vegas)(ccount *pndim, ccount *pncomp,
   Integrand integrand,
-  creal *lower, creal *upper, creal *prdbounds,
-  creal *pepsrel, creal *pepsabs,
+  ctreal *lower, ctreal *upper, ctreal *prdbounds,
+  ctreal *pepsrel, ctreal *pepsabs,
   cint *pflags, cnumber *pmineval, cnumber *pmaxeval,
   cnumber *pnstart, cnumber *pnincrease, 
   number *pneval, int *pfail,
-  real *integral, real *error, real *prob)
+  real *integral, real *erreur, real *prob)
 {
   /* make sure the filename is null-terminated */
   if( *EXPORT(vegasstate) ) {
@@ -135,7 +132,7 @@ R_CheckUserInterrupt(); // to allow user interruptions
     *pflags, *pmineval, *pmaxeval,
     *pnstart, *pnincrease,
     pneval, pfail,
-    integral, error, prob);
+    integral, erreur, prob);
 }
 
 /*********************************************************************/
@@ -153,16 +150,13 @@ void Rvegas(int *pndim, int *pncomp,
 	    int *pnstart, int *pnincrease, 
 	    char **state,
 	    int *pneval, int *pfail,
-	    double *integral, double *error, double *prob)
+	    double *integral, double *erreur, double *prob)
 {
-  //extern unsigned int mersenneseed;
- extern int vegasnbatch;
- extern int vegasgridno;
- extern char vegasstate[128];
+
 
   /* store the R function and its environment in a global*/
   rho= (SEXP)(env);
-  f= (SEXP)(integrand);
+  globf= (SEXP)(integrand);
 
   if (strlen(*state) >0) {
     strncpy(vegasstate, *state, 128);
@@ -172,23 +166,23 @@ void Rvegas(int *pndim, int *pncomp,
   if (NA_INTEGER != *pmersenneseed) 
     SUFFIX(mersenneseed) = *pmersenneseed;
   if (NA_INTEGER != *pvegasnbatch) 
-    vegasnbatch= *pvegasnbatch;
+    EXPORT(vegasnbatch)= *pvegasnbatch;
   else
-    vegasnbatch=1000;
+    EXPORT(vegasnbatch)=1000;
 
   if (NA_INTEGER != *pvegasgridno) 
-    vegasgridno= *pvegasgridno;
+    EXPORT(vegasgridno)= *pvegasgridno;
   else
-    vegasgridno=0;
+    EXPORT(vegasgridno)=0;
 
   /* call vegas */
   vegas((ccount *)pndim, (ccount *)pncomp,
 	(Integrand)RIntegrand,
-(creal *)lower, (creal *)upper, (creal *)prdbounds,
-  (creal *)pepsrel, (creal *)pepsabs,
+(ctreal *)lower, (ctreal *)upper, (ctreal *)prdbounds,
+  (ctreal *)pepsrel, (ctreal *)pepsabs,
 	(cint *)pflags, (cnumber *)pmineval, (cnumber *)pmaxeval,
   (cnumber *)pnstart, (cnumber *)pnincrease, 
 	(number *)pneval, (int *)pfail,
-	(real *)integral, (real *)error, (real *)prob);
+	(real *)integral, (real *)erreur, (real *)prob);
 
 } // End Rvegas

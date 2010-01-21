@@ -1,7 +1,9 @@
 #ifndef __cuhre_rule_h__
 #define __cuhre_rule_h__
+#include "inclR.h"
+#include "cuhre_decl.h"
+#include "cuhre_util.h"
 
-// Compilation note for R interface: move Rule.c into Rule.h
 /*
 	Rule.c
 		integration with cubature rules
@@ -11,32 +13,13 @@
 		last modified 9 Feb 05 th
 */
 
-// Compilation note for R interface: add include
-#include "cuhre_decl.h"
-// To rescale into the user unit
-#define RESCALE(a, d) (a * (upper_[d] - lower_[d]) + lower_[d])
 
-enum { nrules = 5 };
-
-#define TYPEDEFSET \
-  typedef struct { \
-    count n; \
-    real weight[nrules], scale[nrules], norm[nrules]; \
-    real gen[NDIM]; \
-  } Set
 
 /*********************************************************************/
 
-static inline void RuleFree(Rule *rule)
+static void cuhreRule13Alloc(Rule *rule)
 {
-  free(rule->first);
-}
-
-/*********************************************************************/
-
-static void Rule13Alloc(Rule *rule)
-{
-  static creal w[][nrules] = {
+  static ctreal w[][nrules] = {
     { .00844923090033615,     .3213775489050763,     .3372900883288987,
      -.8264123822525677,      .6539094339575232 },
     { .023771474018994404,   -.1767341636743844,    -.1644903060344491,
@@ -67,7 +50,7 @@ static void Rule13Alloc(Rule *rule)
       .003760268580063992,    .02561989142123099 }
   };
 
-  static creal g[] = {
+  static ctreal g[] = {
      .12585646717265545,      .3506966822267133,
      .4795480315809981,       .4978005239276064,
      .25,                     .07972723291487795,
@@ -79,7 +62,7 @@ static void Rule13Alloc(Rule *rule)
 
   enum { nsets = 14, ndim = 2 };
 
-  TYPEDEFSET;
+  CUHRETYPEDEFSET;
 
   count n, r;
   Set *first, *last, *s, *t;
@@ -173,7 +156,7 @@ static void Rule13Alloc(Rule *rule)
 
   for( s = first; s <= last; ++s )
     for( r = 1; r < nrules - 1; ++r ) {
-      creal scale = (s->weight[r] == 0) ? 100 :
+      ctreal scale = (s->weight[r] == 0) ? 100 :
         -s->weight[r + 1]/s->weight[r];
       real sum = 0;
       for( t = first; t <= last; ++t )
@@ -185,9 +168,9 @@ static void Rule13Alloc(Rule *rule)
 
 /*********************************************************************/
 
-static void Rule11Alloc(Rule *rule)
+static void cuhreRule11Alloc(Rule *rule)
 {
-  static creal w[][nrules] = {
+  static ctreal w[][nrules] = {
     { .0009903847688882167,  1.715006248224684,     1.936014978949526,
       .517082819560576,      2.05440450381852 },
     { .0084964717409851,     -.3755893815889209,    -.3673449403754268,
@@ -216,7 +199,7 @@ static void Rule11Alloc(Rule *rule)
       .003019236275367777,    .0028782064230998723 }
   };
 
-  static creal g[] = {
+  static ctreal g[] = {
      .095,                    .25,
      .375,                    .4,
      .4975,                   .49936724991757,
@@ -227,7 +210,7 @@ static void Rule11Alloc(Rule *rule)
 
   enum { nsets = 13, ndim = 3 };
 
-  TYPEDEFSET;
+  CUHRETYPEDEFSET;
 
   count n, r;
   Set *first, *last, *s, *t;
@@ -320,7 +303,7 @@ static void Rule11Alloc(Rule *rule)
 
   for( s = first; s <= last; ++s )
     for( r = 1; r < nrules - 1; ++r ) {
-      creal scale = (s->weight[r] == 0) ? 100 :
+      ctreal scale = (s->weight[r] == 0) ? 100 :
         -s->weight[r + 1]/s->weight[r];
       real sum = 0;
       for( t = first; t <= last; ++t )
@@ -332,9 +315,9 @@ static void Rule11Alloc(Rule *rule)
 
 /*********************************************************************/
 
-static void Rule9Alloc(Rule *rule)
+static void cuhreRule9Alloc(Rule *rule)
 {
-  static creal w[] = {
+  static ctreal w[] = {
     -.0023611709677855117884,   .11415390023857325268,
     -.63833920076702389094,     .74849988504685208004,
     -.0014324017033399125142,   .057471507864489725949,
@@ -357,14 +340,14 @@ static void Rule9Alloc(Rule *rule)
     -.32544759695960125297,     .0017708782258391338413,
      .0010743012775049343856,   .25150011495314791996 };
 
-  static creal g[] = {
+  static ctreal g[] = {
      .47795365790226950619,     .20302858736911986780,
      .44762735462617812882,     .125,
      .34303789878087814570 };
 
   enum { nsets = 9 };
 
-  TYPEDEFSET;
+  CUHRETYPEDEFSET;
 
   ccount ndim = ndim_;
   ccount twondim = 1 << ndim;
@@ -464,7 +447,7 @@ static void Rule9Alloc(Rule *rule)
 
   for( s = first; s <= last; ++s )
     for( r = 1; r < nrules - 1; ++r ) {
-      creal scale = (s->weight[r] == 0) ? 100 :
+      ctreal scale = (s->weight[r] == 0) ? 100 :
         -s->weight[r + 1]/s->weight[r];
       real sum = 0;
       for( t = first; t <= last; ++t )
@@ -476,9 +459,9 @@ static void Rule9Alloc(Rule *rule)
 
 /*********************************************************************/
 
-static void Rule7Alloc(Rule *rule)
+static void cuhreRule7Alloc(Rule *rule)
 {
-  static creal w[] = {
+  static ctreal w[] = {
      .019417866674748388428,   -.40385257701150182546,
      .64485668767465982223,     .01177982690775806141,
     -.18041318740733609012,    -.088785828081335044443,
@@ -491,13 +474,13 @@ static void Rule7Alloc(Rule *rule)
      .0058899134538790307051,  -.0048544666686870971071,
      .35514331232534017777 };
 
-  static creal g[] = {
+  static ctreal g[] = {
      .47795365790226950619,     .20302858736911986780,
      .375,                      .34303789878087814570 };
 
   enum { nsets = 6 };
 
-  TYPEDEFSET;
+  CUHRETYPEDEFSET;
 
   ccount ndim = ndim_;
   ccount twondim = 1 << ndim;
@@ -567,7 +550,7 @@ static void Rule7Alloc(Rule *rule)
 
   for( s = first; s <= last; ++s )
     for( r = 1; r < nrules - 1; ++r ) {
-      creal scale = (s->weight[r] == 0) ? 100 :
+      ctreal scale = (s->weight[r] == 0) ? 100 :
         -s->weight[r + 1]/s->weight[r];
       real sum = 0;
       for( t = first; t <= last; ++t )
@@ -577,159 +560,5 @@ static void Rule7Alloc(Rule *rule)
     }
 }
 
-/*********************************************************************/
-
-static real *ExpandFS(cBounds *b, real *g, real *x)
-{
-  count dim, ndim = ndim_;
-
-next:
-  /* Compute centrally symmetric sum for permutation of G */
-
-  for( dim = 0; dim < ndim; ++dim )
-    *x++ = (.5 + g[dim])*b[dim].lower + (.5 - g[dim])*b[dim].upper;
-
-  for( dim = 0; dim < ndim; ) {
-    g[dim] = -g[dim];
-    if( g[dim++] < 0 ) goto next;
-  }
-
-  /* Find next distinct permutation of G and loop back for next sum.
-     Permutations are generated in reverse lexicographic order. */
-
-  for( dim = 1; dim < ndim; ++dim ) {
-    creal gd = g[dim];
-    if( g[dim - 1] > gd ) {
-      count i, ix = 0, j = dim, dx = dim - 1;
-      for( i = 0; i < --j; ++i ) {
-        creal tmp = g[i];
-        g[i] = g[j];
-        g[j] = tmp;
-        if( tmp <= gd ) --dx;
-        if( g[i] > gd ) ix = i;
-      }
-      if( g[dx] <= gd ) dx = ix;
-      g[dim] = g[dx];
-      g[dx] = gd;
-      goto next;
-    }
-  }
-
-  /* Restore original order to generators */
-  for( dim = 0; dim < --ndim; ++dim ) {
-    creal tmp = g[dim];
-    g[dim] = g[ndim];
-    g[ndim] = tmp;
-  }
-
-  return x;
-}
-
-/*********************************************************************/
-
-static void Sample(cRule *rule, void *voidregion, cint flags)
-{
-  TYPEDEFREGION;
-  TYPEDEFSET;
-
-  Region *const region = (Region *)voidregion;
-  creal vol = ldexp(1., -region->div);
-
-  real *x = rule->x, *f = rule->f;
-  Set *first = (Set *)rule->first, *last = (Set *)rule->last, *s;
-  creal *errcoeff = rule->errcoeff;
-  creal ratio = Sq(first[2].gen[0]/first[1].gen[0]);
-
-  ccount offset = 2*ndim_*ncomp_;
-  count dim, comp, rul, n, maxdim = 0;
-  real maxrange = 0;
-
-  for( dim = 0; dim < ndim_; ++dim ) {
-    cBounds *b = &region->bounds[dim];
-    creal range = b->upper - b->lower;
-    if( range > maxrange ) {
-      maxrange = range;
-      maxdim = dim;
-    }
-  }
-
-  for( s = first; s <= last; ++s )
-    if( s->n ) x = ExpandFS(region->bounds, s->gen, x);
-
-
-  DoSample(rule->n, rule->x, f);
-
-  for( comp = 0; comp < ncomp_; ++comp ) {
-    Result *r = &region->result[comp];
-    real sum[nrules];
-    creal *f1 = f;
-    creal base = *f1*2*(1 - ratio);
-    real maxdiff = 0;
-    count bisectdim = maxdim;
-
-    for( dim = 0; dim < ndim_; ++dim ) {
-      creal *fp = f1 + ncomp_;
-      creal *fm = fp + ncomp_;
-      creal fourthdiff = fabs(base +
-        ratio*(fp[0] + fm[0]) - (fp[offset] + fm[offset]));
-      f1 = fm;
-      if( fourthdiff > maxdiff ) {
-        maxdiff = fourthdiff;
-        bisectdim = dim;
-      }
-    }
-    r->bisectdim = bisectdim;
-
-    f1 = f++;
-    Zap(sum);
-    for( s = first; s <= last; ++s )
-      for( n = s->n; n; --n ) {
-        creal fun = *f1;
-        f1 += ncomp_;
-        for( rul = 0; rul < nrules; ++rul )
-          sum[rul] += fun*s->weight[rul];
-      }
-
-    /* Search for the null rule, in the linear space spanned by two
-       successive null rules in our sequence, which gives the greatest
-       error estimate among all normalized (1-norm) null rules in this
-       space. */
-
-    for( rul = 1; rul < nrules - 1; ++rul ) {
-      real maxerr = 0;
-      for( s = first; s <= last; ++s )
-        maxerr = Max(maxerr,
-          fabs(sum[rul + 1] + s->scale[rul]*sum[rul])*s->norm[rul]);
-      sum[rul] = maxerr;
-    }
-
-    r->avg = vol*sum[0];
-    r->err = vol*(
-      (errcoeff[0]*sum[1] <= sum[2] && errcoeff[0]*sum[2] <= sum[3]) ?
-        errcoeff[1]*sum[1] :
-        errcoeff[2]*Max(Max(sum[1], sum[2]), sum[3]) );
-  }
-
-  if( VERBOSE > 2 ) {
-    char s[64*NDIM + 128*NCOMP], *p = s;
-
-    for( dim = 0; dim < ndim_; ++dim ) {
-      cBounds *b = &region->bounds[dim];
-      // Rescaler les bornes de la region
-      p += sprintf(p,
-        (dim == 0) ? "\nRegion (" REALF ") - (" REALF ")" :
-                     "\n       (" REALF ") - (" REALF ")",
-		   RESCALE(b->lower,dim),  RESCALE(b->upper,dim));
-    }
-
-    for( comp = 0; comp < ncomp_; ++comp ) {
-      cResult *r = &region->result[comp];
-      p += sprintf(p, "\n[" COUNT "] "
-        REEL " +- " REEL, comp + 1, r->avg, r->err);
-    }
-
-    Print(s);
-  }
-}
 
 #endif

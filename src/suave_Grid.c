@@ -1,6 +1,3 @@
-#ifndef __suave_grid_h__
-#define __suave_grid_h__
- //Compilation note for R interface: move into a .h
 /*
 	Grid.c
 		utility functions for the Vegas grid
@@ -8,8 +5,10 @@
 		last modified 15 Feb 08 th
 */
 
+#include "suave_decl.h"
+#include "suave_util.h"
 
-static void RefineGrid(Grid grid, Grid margsum, cint flags)
+ void suaveRefineGrid(Grid grid, Grid margsum, cint flags)
 {
   real avgperbin, thisbin, newcur, delta;
   Grid imp, newgrid;
@@ -20,7 +19,7 @@ static void RefineGrid(Grid grid, Grid margsum, cint flags)
   real cur = margsum[1];
   real norm = margsum[0] = .5*(prev + cur);
   for( bin = 1; bin < NBINS - 1; ++bin ) {
-    creal s = prev + cur;
+    ctreal s = prev + cur;
     prev = cur;
     cur = margsum[bin + 1];
     norm += margsum[bin] = (s + cur)/3.;
@@ -35,7 +34,7 @@ static void RefineGrid(Grid grid, Grid margsum, cint flags)
   for( bin = 0; bin < NBINS; ++bin ) {
     real impfun = 0;
     if( margsum[bin] > 0 ) {
-      creal r = margsum[bin]*norm;
+      ctreal r = margsum[bin]*norm;
       avgperbin += impfun = pow((r - 1)/log(r), 1.5);
     }
     imp[bin] = impfun;
@@ -65,8 +64,8 @@ static void RefineGrid(Grid grid, Grid margsum, cint flags)
 
 /*********************************************************************/
 
-static void Reweight(Bounds *b,
-  creal *w, creal *f, creal *lastf, cResult *total, cint flags)
+ void Reweight(Bounds *b,
+  ctreal *w, ctreal *f, ctreal *lastf, cResult *total, cint flags)
 {
   Grid margsum[NDIM];
   real scale[NCOMP];
@@ -93,12 +92,12 @@ static void Reweight(Bounds *b,
   }
 
   for( dim = 0; dim < ndim_; ++dim )
-    RefineGrid(b[dim].grid, margsum[dim], flags);
+    suaveRefineGrid(b[dim].grid, margsum[dim], flags);
 }
 
 /*********************************************************************/
 
-static void StretchGrid(cGrid grid, Grid gridL, Grid gridR)
+ void StretchGrid(cGrid grid, Grid gridL, Grid gridR)
 {
   real prev = 0, cur, step, x;
   count bin = 0;
@@ -136,6 +135,3 @@ static void StretchGrid(cGrid grid, Grid gridL, Grid gridR)
   }
   gridR[NBINS - 1] = 1;
 }
-
-
-#endif

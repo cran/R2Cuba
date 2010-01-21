@@ -1,6 +1,6 @@
 #ifndef __suave_fluct_h__
 #define __suave_fluct_h__
-//Compilation note for R interface: move into a .h
+#include "suave_util.h"
 /*
 	Fluct.c
 		compute the fluctuation in the left and right half
@@ -30,14 +30,15 @@ typedef struct {
   number n;
 } Var;
 
+
 /*********************************************************************/
 
 static void Fluct(Var *var, real flatness,
-  cBounds *b, creal *w, number n, ccount comp, creal avg, creal err)
+  cBounds *b, ctreal *w, number n, ccount comp, ctreal avg, ctreal err)
 {
-  creal *x = w + n, *f = x + n*ndim_ + comp;
-  creal max = ldexp(1., (int)((XDBL_MAX_EXP - 2)/flatness));
-  creal norm = 1/(err*Max(fabs(avg), err));
+  ctreal *x = w + n, *f = x + n*ndim_ + comp;
+  ctreal max = ldexp(1., (int)((XDBL_MAX_EXP - 2)/flatness));
+  ctreal norm = 1/(err*Max(fabs(avg), err));
   count nvar = 2*ndim_;
 
   Clear(var, nvar);
@@ -51,8 +52,8 @@ static void Fluct(Var *var, real flatness,
 
     for( dim = 0; dim < ndim_; ++dim ) {
       Var *v = &var[2*dim + (*x++ >= b[dim].mid)];
-      const xdouble f = v->fluct + t;
-      v->fluct = (f > XDBL_MAX/2) ? XDBL_MAX/2 : f;
+      const xdouble fi = v->fluct + t;
+      v->fluct = (fi > XDBL_MAX/2) ? XDBL_MAX/2 : fi;
       ++v->n;
     }
   }

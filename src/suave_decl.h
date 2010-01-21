@@ -39,18 +39,18 @@ typedef struct {
 typedef const Bounds cBounds;
 
 
-#define TYPEDEFREGION \
+#define SUAVETYPEDEFREGION \
   typedef struct region { \
     struct region *next; \
     count div, df; \
     number n; \
-    Result result[NCOMP]; \
-    Bounds bounds[NDIM]; \
-    real fluct[NCOMP][NDIM][2]; \
+    Result result[MAXNCOMP]; \
+    Bounds bounds[MAXNDIM]; \
+    real fluct[MAXNCOMP][MAXNDIM][2]; \
     real w[]; \
   } Region
 
 
-typedef void (*Integrand)(ccount *, creal *, ccount *,   creal *lower, creal *upper, creal prdbounds,  real *,creal *);
+typedef void (*Integrand)(ccount *, ctreal *, ccount *,   ctreal *lower, ctreal *upper, ctreal prdbounds,  real *,ctreal *);
 
 #endif

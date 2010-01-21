@@ -43,7 +43,7 @@ typedef const Rule cRule;
 typedef struct samples {
   real weight;
   real *x, *f, *avg, *err;
-  void (*sampler)(const struct samples *, cBounds *, creal);
+  void (*sampler)(const struct samples *, cBounds *, ctreal);
   cRule *rule;
   count coeff;
   number n, neff;
@@ -52,24 +52,24 @@ typedef struct samples {
 typedef const Samples cSamples;
 
 
-#define TYPEDEFREGION \
+#define DIVONNETYPEDEFREGION \
   typedef struct { \
     real avg, err, spread, chisq; \
     real fmin, fmax; \
-    real xmin[NDIM], xmax[NDIM]; \
+    real xmin[MAXNDIM], xmax[MAXNDIM]; \
   } Result; \
   typedef const Result cResult; \
   typedef struct region { \
     count cutcomp, depth, xmajor; \
     real fmajor, fminor, vol; \
-    Bounds bounds[NDIM]; \
-    Result result[NCOMP]; \
+    Bounds bounds[MAXNDIM]; \
+    Result result[MAXNCOMP]; \
   } Region
 
 #define CHUNKSIZE 4096
 
 
-typedef void (*Integrand)(ccount *, creal *, ccount *,  creal *lower, creal *upper, creal prdbounds, real *, cint *);
+typedef void (*Integrand)(ccount *, ctreal *, ccount *,  ctreal *lower, ctreal *upper, ctreal prdbounds, real *, cint *);
 
 typedef void (*PeakFinder)(ccount *, cBounds *, number *, real *);
 

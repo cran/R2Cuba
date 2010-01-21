@@ -1,7 +1,3 @@
-#ifndef __divonne_sample_h__
-#define __divonne_sample_h__
-
-//Compilation note for R interface: move into a .h
 /*
 	Sample.c
 		most of what is related to sampling
@@ -9,44 +5,48 @@
 		last modified 4 Mar 05 th
 */
 
+#include "divonne_util.h"
+#include "divonne_Rule.h"
 
-#define MARKMASK 0xfffffff
-#define Marked(x) ((x) & ~MARKMASK)
-#define Unmark(x) ((x) & MARKMASK)
+
+extern void divonneDoSample(number n, ccount ldx, ctreal *x,real *f);
+extern void SampleRule(cSamples *samples, cBounds *b, ctreal vol);
+extern void GetRandom(real *x, count ndim);
+
 
 #define MEM(samples) (samples)->x
 
 /*********************************************************************/
 
-static inline void SamplesIni(Samples *samples)
+ void SamplesIni(Samples *samples)
 {
   MEM(samples) = NULL;
 }
 
 /*********************************************************************/
 
-static inline void SamplesFree(cSamples *samples)
+ void SamplesFree(cSamples *samples)
 {
   if( MEM(samples) ) free(MEM(samples));
 }
 
 /*********************************************************************/
 
-static void SampleSobol(cSamples *samples, cBounds *b, creal vol)
+ void SampleSobol(cSamples *samples, cBounds *b, ctreal vol)
 {
-  creal norm = vol*samples->weight;
+  ctreal norm = vol*samples->weight;
   real *x = samples->x, *f = samples->f, *avg = samples->avg;
   cnumber n = samples->n;
   number i;
   count dim, comp;
 
   for( i = 0; i < n; ++i ) {
-    GetRandom(x);
+    GetRandom(x, ndim_);
     for( dim = 0; dim < ndim_; ++x, ++dim )
       *x = b[dim].lower + *x*(b[dim].upper - b[dim].lower);
   }
 
-  DoSample(n, ndim_, samples->x, f);
+  divonneDoSample(n, ndim_, samples->x, f);
 
   ResCopy(avg, f);
   f += ncomp_;
@@ -60,9 +60,9 @@ static void SampleSobol(cSamples *samples, cBounds *b, creal vol)
 
 /*********************************************************************/
 
-static void SampleKorobov(cSamples *samples, cBounds *b, creal vol)
+ void SampleKorobov(cSamples *samples, cBounds *b, ctreal vol)
 {
-  creal norm = vol*samples->weight;
+  ctreal norm = vol*samples->weight;
   real *x = samples->x, *xlast = x + ndim_;
   real *f = samples->f, *flast = f + ncomp_;
   real *avg = samples->avg;
@@ -74,14 +74,14 @@ static void SampleKorobov(cSamples *samples, cBounds *b, creal vol)
   for( i = 1; i < n; ++i ) {
     number c = i;
     for( dim = 0; dim < ndim_; ++dim ) {
-      creal dx = abs(2*c - neff)*samples->weight;
+      ctreal dx = abs(2*c - neff)*samples->weight;
       *xlast++ = b[dim].lower + dx*(b[dim].upper - b[dim].lower);
       c = c*samples->coeff % neff;
     }
   }
 
   for( dim = 0; dim < ndim_; ++dim ) {
-    creal dx = (x[dim] = b[dim].upper) - border_.upper;
+    ctreal dx = (x[dim] = b[dim].upper) - border_.upper;
     if( dx > 0 ) dist += Sq(dx);
   }
 
@@ -98,7 +98,7 @@ static void SampleKorobov(cSamples *samples, cBounds *b, creal vol)
     ++nextra;
   }
 
-  DoSample(nextra, ndim_, x, f);
+  divonneDoSample(nextra, ndim_, x, f);
 
   ResCopy(avg, flast);
   flast += ncomp_;
@@ -119,9 +119,6 @@ static void SampleKorobov(cSamples *samples, cBounds *b, creal vol)
 
 /*********************************************************************/
 
-#define IsSobol(k) NegQ(k)
-#define IsRule(k, d) (k == 9 || k == 7 || (k == 11 && d == 3) || (k == 13 && d == 2))
-
 /* The following coding is used for key1, key2, key3:
              0 = for key1, key2: use default,
                  for key3: do nothing,
@@ -135,31 +132,31 @@ static void SampleKorobov(cSamples *samples, cBounds *b, creal vol)
          1..39 = multiplicator,        Korobov numbers,
        40..inf = absolute # of points, Korobov numbers.  */
 
-static count SamplesLookup(Samples *samples, cint key,
+ count SamplesLookup(Samples *samples, cint key,
   cnumber nwant, cnumber nmax, number nmin)
 {
   number n;
 
   if( key == 13 && ndim_ == 2 ) {
-    if( rule13_.first == NULL ) Rule13Alloc(&rule13_);
+    if( rule13_.first == NULL ) divonneRule13Alloc(&rule13_);
     samples->rule = &rule13_;
     samples->n = n = nmin = rule13_.n;
     samples->sampler = SampleRule;
   }
   else if( key == 11 && ndim_ == 3 ) {
-    if( rule11_.first == NULL ) Rule11Alloc(&rule11_);
+    if( rule11_.first == NULL ) divonneRule11Alloc(&rule11_);
     samples->rule = &rule11_;
     samples->n = n = nmin = rule11_.n;
     samples->sampler = SampleRule;
   }
   else if( key == 9 ) {
-    if( rule9_.first == NULL ) Rule9Alloc(&rule9_);
+    if( rule9_.first == NULL ) divonneRule9Alloc(&rule9_);
     samples->rule = &rule9_;
     samples->n = n = nmin = rule9_.n;
     samples->sampler = SampleRule;
   }
   else if( key == 7 ) {
-    if( rule7_.first == NULL ) Rule7Alloc(&rule7_);
+    if( rule7_.first == NULL ) divonneRule7Alloc(&rule7_);
     samples->rule = &rule7_;
     samples->n = n = nmin = rule7_.n;
     samples->sampler = SampleRule;
@@ -179,10 +176,8 @@ static count SamplesLookup(Samples *samples, cint key,
 
 /*********************************************************************/
 
-static void SamplesAlloc(Samples *samples)
+ void SamplesAlloc(Samples *samples)
 {
-#define FIRST -INT_MAX
-#define MarkLast(x) (x | Marked(INT_MAX))
 
 #include "divonne_KorobovCoeff.h"
 
@@ -219,7 +214,7 @@ static void SamplesAlloc(Samples *samples)
 
 /*********************************************************************/
 
-static real Sample(creal *x0)
+ real divonneSample(ctreal *x0)
 {
   real xtmp[2*NDIM], ftmp[2*NCOMP], *xlast = xtmp, f;
   real dist = 0;
@@ -227,7 +222,7 @@ static real Sample(creal *x0)
   number nextra = 1;
 
   for( dim = 0; dim < ndim_; ++dim ) {
-    creal x1 = *xlast++ = Min(Max(*x0++, 0.), 1.);
+    ctreal x1 = *xlast++ = Min(Max(*x0++, 0.), 1.);
     real dx;
     if( (dx = x1 - border_.lower) < 0 ||
         (dx = x1 - border_.upper) > 0 ) dist += Sq(dx);
@@ -247,7 +242,7 @@ static real Sample(creal *x0)
     nextra = 2;
   }
 
-  DoSample(nextra, ndim_, xtmp, ftmp);
+  divonneDoSample(nextra, ndim_, xtmp, ftmp);
 
   f = ftmp[selectedcomp_];
   if( nextra > 1 ) f += dist*(f - ftmp[selectedcomp_ + ncomp_]);
@@ -255,4 +250,4 @@ static real Sample(creal *x0)
   return f;
 }
 
-#endif
+

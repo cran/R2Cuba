@@ -1,6 +1,3 @@
-#ifndef __divonne_integrate_h__
-#define __divonne_integrate_h__
-//Compilation note for R interface: move into a .h
 /*
 	Integrate.c
 		partition the integration region until each region
@@ -9,32 +6,49 @@
 		this file is part of Divonne
 		last modified 8 May 09 th
 */
+#include "divonne_util.h"
+#include "divonne_KorobovCoeff.h"
+#include "common_ChiSquare.h"
 
 
-#define INIDEPTH 3
-#define DEPTH 5
-#define POSTDEPTH 15
+extern bool Explore(count iregion, cSamples *samples, cint depth, cint flags);
+extern void divonneRuleFree(Rule *rule);
+extern void IniRandom(cnumber n, cint flags, count ndim);
+extern void RuleIni(Rule *rule);
+extern void SamplesAlloc(Samples *samples);
+extern void SamplesFree(cSamples *samples);
+extern void SamplesIni(Samples *samples);
+extern count SamplesLookup(Samples *samples, cint key,
+			   cnumber nwant, cnumber nmax, number nmin);
+extern void SampleRule(cSamples *samples, cBounds *b, ctreal vol);
 
-//Compilation note for R interface: add decodflags
-extern
-void decodflags(cint flags, 
+extern void Split(count iregion, int depth);
+
+
+
+
+extern void decodflags(cint flags, 
 		int *smooth,
 		int *pseudorandom,
 		int *final,
 		int *verbose);
 
+#define EPS 0x1p-52 // pow(2, -52)
+#define INIDEPTH 3
+#define DEPTH 5
+#define POSTDEPTH 15
 // To rescale into the user unit
 #define RESCALE(a, d) (a * (upper_[d] - lower_[d]) + lower_[d])
 
 /*********************************************************************/
 
-static int Integrate(creal epsrel, creal epsabs,
+ int divonneIntegrate(ctreal epsrel, ctreal epsabs,
   cint flags, cnumber mineval, cnumber maxeval,
   int key1, int key2, int key3, ccount maxpass, 
-  creal maxchisq, creal mindeviation,
-  real *integral, real *error, real *prob)
+  ctreal maxchisq, ctreal mindeviation,
+  real *integral, real *erreur, real *prob)
 {
-  TYPEDEFREGION;
+  DIVONNETYPEDEFREGION;
 
   Totals totals[NCOMP];
   real nneed, weight;
@@ -93,7 +107,7 @@ static int Integrate(creal epsrel, creal epsabs,
   if( VERBOSE ) Print("Partitioning phase:");
 
   if( IsSobol(key1) || IsSobol(key2) || IsSobol(key3) )
-    IniRandom(2*maxeval, flags);
+    IniRandom(2*maxeval, flags, ndim_);
 
   SamplesLookup(&samples_[0], key1,
     (number)47, (number)INT_MAX, (number)0);
@@ -140,8 +154,9 @@ static int Integrate(creal epsrel, creal epsabs,
       valid += tot->avg == tot->avg;
       if( tot->spreadsq > maxtot->spreadsq ) maxtot = tot;
       tot->spread = sqrt(tot->spreadsq);
-      error[comp] = tot->spread*samples_[0].weight;
+      erreur[comp] = tot->spread*samples_[0].weight;
     }
+
 
     if( VERBOSE ) {
       char s[128 + 64*NCOMP], *p = s;
@@ -156,7 +171,7 @@ static int Integrate(creal epsrel, creal epsabs,
       for( comp = 0; comp < ncomp_; ++comp )
         p += sprintf(p, "\n[" COUNT "] "
           REEL " +- " REEL,
-          comp + 1, integral[comp], error[comp]);
+          comp + 1, integral[comp], erreur[comp]);
 
       Print(s);
     }
@@ -184,7 +199,7 @@ static int Integrate(creal epsrel, creal epsabs,
   nneed = 2*samples_[0].neff;
   for( comp = 0; comp < ncomp_; ++comp ) {
     Totals *tot = &totals[comp];
-    creal maxerr = MaxErr(tot->avg);
+    ctreal maxerr = MaxErr(tot->avg);
     tot->nneed = tot->spread/maxerr;
     nneed = Max(nneed, tot->nneed);
     tot->maxerrsq = Sq(maxerr);
@@ -220,7 +235,7 @@ static int Integrate(creal epsrel, creal epsabs,
     }
 
     ResClear(integral);
-    ResClear(error);
+    ResClear(erreur);
     ResClear(prob);
 
     nlimit = maxeval - nregions_*samples_[1].n;
@@ -250,9 +265,9 @@ refine:
         samples_[0].err[comp] = r->err;
 
         if( neval_ < nlimit ) {
-          creal avg2 = samples_[1].avg[comp];
-          creal err2 = samples_[1].err[comp];
-          creal diffsq = Sq(avg2 - r->avg);
+          ctreal avg2 = samples_[1].avg[comp];
+          ctreal err2 = samples_[1].err[comp];
+          ctreal diffsq = Sq(avg2 - r->avg);
 
 #define Var(s) Sq((s.err[comp] == 0) ? r->spread*s.weight : s.err[comp])
 
@@ -284,9 +299,9 @@ refine:
                     MARKMASK :
                     (number)ceil(sqrt(tot->spreadsq/tot->maxerrsq));
                   if( nnew > nwant + nwant/64 ) {
-                    ccount err = SamplesLookup(&samples_[1], key2, nnew,
+                    ccount erri = SamplesLookup(&samples_[1], key2, nnew,
                       (maxeval - neval_)/nregions_ + 1, samples_[1].n);
-                    fail += Unmark(err)*nregions_;
+                    fail += Unmark(erri)*nregions_;
                     nwant = nnew;
                     SamplesFree(&samples_[1]);
                     SamplesAlloc(&samples_[1]);
@@ -295,11 +310,11 @@ refine:
                       can_adjust = false;
 
                     if( VERBOSE > 2 ) {
-                      char s[128];
-                      sprintf(s, "Sampling remaining " COUNT
+                      char si[128];
+                      sprintf(si, "Sampling remaining " COUNT
                         " regions with " NUMBER " points per region.",
                         nregions_, samples_[1].neff);
-                      Print(s);
+                      Print(si);
                     }
                   }
                 }
@@ -352,11 +367,11 @@ refine:
       for( comp = 0; comp < ncomp_; ++comp ) {
         Result *r = &region->result[comp];
 
-        creal x1 = samples_[0].avg[comp];
-        creal s1 = Var(samples_[0]);
-        creal x2 = samples_[1].avg[comp];
-        creal s2 = Var(samples_[1]);
-        creal r2 = (s1 == 0) ? Sq(samples_[1].neff*samples_[0].weight) : s2/s1;
+        ctreal x1 = samples_[0].avg[comp];
+        ctreal s1 = Var(samples_[0]);
+        ctreal x2 = samples_[1].avg[comp];
+        ctreal s2 = Var(samples_[1]);
+        ctreal r2 = (s1 == 0) ? Sq(samples_[1].neff*samples_[0].weight) : s2/s1;
 
         real norm = 1 + r2;
         real avg = x2 + r2*x1;
@@ -365,9 +380,9 @@ refine:
         real chiden = s1 + s2;
 
         if( todo == 3 ) {
-          creal x3 = samples_[2].avg[comp];
-          creal s3 = Var(samples_[2]);
-          creal r3 = (s2 == 0) ? Sq(samples_[2].neff*samples_[1].weight) : s3/s2;
+          ctreal x3 = samples_[2].avg[comp];
+          ctreal s3 = Var(samples_[2]);
+          ctreal r3 = (s2 == 0) ? Sq(samples_[2].neff*samples_[1].weight) : s3/s2;
 
           norm = 1 + r3*norm;
           avg = x3 + r3*avg;
@@ -393,7 +408,7 @@ refine:
         }
 
         integral[comp] += avg;
-        error[comp] += sigsq;
+        erreur[comp] += sigsq;
         prob[comp] += chisq;
 
         r->avg = avg;
@@ -405,7 +420,7 @@ refine:
     }
 
     for( comp = 0; comp < ncomp_; ++comp )
-      error[comp] = sqrt(error[comp]);
+      erreur[comp] = sqrt(erreur[comp]);
 
     df += nregions_;
 
@@ -417,7 +432,7 @@ refine:
       for( comp = 0; comp < ncomp_; ++comp )
         p += sprintf(p, "\n[" COUNT "] "
           REEL " +- " REEL "  \tchisq " REEL " (" COUNT " df)",
-          comp + 1, integral[comp], error[comp], prob[comp], df);
+          comp + 1, integral[comp], erreur[comp], prob[comp], df);
 
       Print(s);
     }
@@ -464,14 +479,13 @@ abort:
   SamplesFree(&samples_[2]);
   SamplesFree(&samples_[1]);
   SamplesFree(&samples_[0]);
-  RuleFree(&rule13_);
-  RuleFree(&rule11_);
-  RuleFree(&rule9_);
-  RuleFree(&rule7_);
+  divonneRuleFree(&rule13_);
+  divonneRuleFree(&rule11_);
+  divonneRuleFree(&rule9_);
+  divonneRuleFree(&rule7_);
 
   free(region_);
 
   return fail;
 }
 
-#endif

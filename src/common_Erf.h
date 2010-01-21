@@ -12,9 +12,9 @@
 // Compilation note for R interface: add include
 #include "common_stddecl.h"
 
-static real Erfc(creal x)
+static real Erfc(ctreal x)
 {
-  static creal c[] = {
+  static ctreal c[] = {
     2.96316885199227378e-01, 6.12158644495538758e-02,
     1.81581125134637070e-01, 5.50942780056002085e-01,
     6.81866451424939493e-02, 1.53039662058770397e+00,
@@ -35,9 +35,9 @@ static real Erfc(creal x)
 }
 
 
-static real Erf(creal x)
+static real Erf(ctreal x)
 {
-  static creal c[] = {
+  static ctreal c[] = {
     1.12837916709551257e+00,
    -3.76126389031833602e-01,
     1.12837916706621301e-01,

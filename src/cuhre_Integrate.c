@@ -1,7 +1,4 @@
-#ifndef __cuhre_integrate_h__
-#define __cuhre_integrate_h__
 
-//Compilation note for R interface: move Integrate.c into cuhre_Integrate.h
 /*
 	Integrate.c
 		integrate over the unit hypercube
@@ -10,24 +7,29 @@
 */
 #define POOLSIZE 1024
 
-//Compilation note for R interface: add include
+
+#include "common_ChiSquare.h"
 #include "cuhre_decl.h"
-//Compilation note for R interface: add decodflags
-extern
-void decodflags(cint flags, 
+#include "cuhre_util.h"
+#include "cuhre_Rule.h"
+extern void cuhreSample(cRule *rule, void *voidregion, cint flags);
+extern void cuhreRuleFree(Rule *rule);
+
+extern void decodflags(cint flags, 
 		int *smooth,
 		int *pseudorandom,
 		int *final,
 		int *verbose);
 
 
-static int Integrate(  creal epsrel, creal epsabs,
+/*********************************************************************/
+ int cuhreIntegrate(  ctreal epsrel, ctreal epsabs,
   cint flags, number mineval, cnumber maxeval, ccount key,
-  real *integral, real *error, real *prob)
+  real *integral, real *erreur, real *prob)
 {
 
 
-  TYPEDEFREGION;
+  CUHRETYPEDEFREGION;
   typedef struct pool {
     struct pool *next;
     Region region[POOLSIZE];
@@ -65,14 +67,14 @@ int smooth, pseudorandom, final, verbose;
   if( setjmp(abort_) ) goto abort;
 #endif
 
-  if( key == 13 && ndim_ == 2 ) Rule13Alloc(&rule);
-  else if( key == 11 && ndim_ == 3 ) Rule11Alloc(&rule);
-  else if( key == 9 ) Rule9Alloc(&rule);
-  else if( key == 7 ) Rule7Alloc(&rule);
+  if( key == 13 && ndim_ == 2 ) cuhreRule13Alloc(&rule);
+  else if( key == 11 && ndim_ == 3 ) cuhreRule11Alloc(&rule);
+  else if( key == 9 ) cuhreRule9Alloc(&rule);
+  else if( key == 7 ) cuhreRule7Alloc(&rule);
   else {
-    if( ndim_ == 2 ) Rule13Alloc(&rule);
-    else if( ndim_ == 3 ) Rule11Alloc(&rule);
-    else Rule9Alloc(&rule);
+    if( ndim_ == 2 ) cuhreRule13Alloc(&rule);
+    else if( ndim_ == 3 ) cuhreRule11Alloc(&rule);
+    else cuhreRule9Alloc(&rule);
   }
 
   Alloc(rule.x, rule.n*(ndim_ + ncomp_));
@@ -92,7 +94,7 @@ int smooth, pseudorandom, final, verbose;
     b->upper = 1;
   }
 
-  Sample(&rule, region, flags);
+  cuhreSample(&rule, region, flags);
 
   for( comp = 0; comp < ncomp_; ++comp ) {
     Totals *tot = &totals[comp];
@@ -131,7 +133,7 @@ int smooth, pseudorandom, final, verbose;
     maxratio = -INFTY;
     maxcomp = 0;
     for( comp = 0; comp < ncomp_; ++comp ) {
-      creal ratio = totals[comp].err/MaxErr(totals[comp].avg);
+      ctreal ratio = totals[comp].err/MaxErr(totals[comp].avg);
       if( ratio > maxratio ) {
         maxratio = ratio;
         maxcomp = comp;
@@ -150,11 +152,11 @@ int smooth, pseudorandom, final, verbose;
     npool = ncur;
     for( pool = cur; pool; npool = POOLSIZE, pool = pool->next )
       for( ipool = 0; ipool < npool; ++ipool ) {
-        Region *region = &pool->region[ipool];
-        creal err = region->result[maxcomp].err;
+        Region *regioni = &pool->region[ipool];
+        ctreal err = regioni->result[maxcomp].err;
         if( err > maxerr ) {
           maxerr = err;
-          regionL = region;
+          regionL = regioni;
         }
       }
 
@@ -175,8 +177,8 @@ int smooth, pseudorandom, final, verbose;
     bR = &regionR->bounds[bisectdim];
     bL->upper = bR->lower = .5*(bL->upper + bL->lower);
 
-    Sample(&rule, regionL, flags);
-    Sample(&rule, regionR, flags);
+    cuhreSample(&rule, regionL, flags);
+    cuhreSample(&rule, regionR, flags);
 
     for( comp = 0; comp < ncomp_; ++comp ) {
       cResult *r = &result[comp];
@@ -190,7 +192,7 @@ int smooth, pseudorandom, final, verbose;
       diff = fabs(.25*diff);
       err = rL->err + rR->err;
       if( err > 0 ) {
-        creal c = 1 + 2*diff/err;
+        ctreal c = 1 + 2*diff/err;
         rL->err *= c;
         rR->err *= c;
       }
@@ -220,7 +222,7 @@ int smooth, pseudorandom, final, verbose;
   for( comp = 0; comp < ncomp_; ++comp ) {
     cTotals *tot = &totals[comp];
     integral[comp] = tot->avg;
-    error[comp] = tot->err;
+    erreur[comp] = tot->err;
     prob[comp] = ChiSquare(tot->chisq, nregions - 1);
   }
 
@@ -265,11 +267,10 @@ abort:
   }
 
   free(rule.x);
-  RuleFree(&rule);
+  cuhreRuleFree(&rule);
 
   nregions_ = nregions;
 
   return fail;
 }
 
-#endif

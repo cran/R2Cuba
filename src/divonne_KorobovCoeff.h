@@ -1,6 +1,6 @@
 #ifndef __divonne_korobovcoeff_h__
 #define __divonne_korobovcoeff_h__
-//Compilation note for R interface: move into a .h
+#include "divonne_util.h"
 
 #define KOROBOV_MINDIM 2
 #define KOROBOV_MAXDIM 33

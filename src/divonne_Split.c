@@ -1,5 +1,8 @@
-#ifndef __divonne_split_h__
-#define __divonne_split_h__
+#include "divonne_util.h"
+
+extern bool Explore(count iregion, cSamples *samples, cint depth, cint flags);
+extern real divonneSample(ctreal *x0);
+
 //Compilation note for R interface: move into a .h
 /*
 	Split.c
@@ -36,16 +39,17 @@ typedef struct {
 
 typedef const Errors cErrors;
 
+
 /*********************************************************************/
 
-static inline real Div(creal a, creal b)
+  real Div(ctreal a, ctreal b)
 {
   return (b != 0 && fabs(b) < BIG*fabs(a)) ? a/b : a;
 }
 
 /*********************************************************************/
 
-static void SomeCut(Cut *cut, Bounds *b)
+ void SomeCut(Cut *cut, Bounds *b)
 {
   count dim, maxdim;
   static count nextdim = 0;
@@ -53,17 +57,17 @@ static void SomeCut(Cut *cut, Bounds *b)
 
   for( dim = 0; dim < ndim_; ++dim )
     xmid[dim] = .5*(b[dim].upper + b[dim].lower);
-  ymid = Sample(xmid);
+  ymid = divonneSample(xmid);
 
   maxdev = 0;
   maxdim = 0;
   for( dim = 0; dim < ndim_; ++dim ) {
     real ylower, yupper, dev;
-    creal x = xmid[dim];
+    ctreal x = xmid[dim];
     xmid[dim] = b[dim].lower;
-    ylower = Sample(xmid);
+    ylower = divonneSample(xmid);
     xmid[dim] = b[dim].upper;
-    yupper = Sample(xmid);
+    yupper = divonneSample(xmid);
     xmid[dim] = x;
 
     dev = fabs(ymid - .5*(ylower + yupper));
@@ -83,7 +87,7 @@ static void SomeCut(Cut *cut, Bounds *b)
 
 /*********************************************************************/
 
-static inline real Volume(creal *delta)
+  real Volume(ctreal *delta)
 {
   real vol = 1;
   count dim;
@@ -94,7 +98,7 @@ static inline real Volume(creal *delta)
 
 /*********************************************************************/
 
-static inline real SetupEqs(Cut *cut, ccount ncut, real f)
+  real SetupEqs(Cut *cut, ccount ncut, real f)
 {
   real sqsum = 0;
   Cut *c = &cut[ncut];
@@ -107,8 +111,8 @@ static inline real SetupEqs(Cut *cut, ccount ncut, real f)
 
 /*********************************************************************/
 
-static inline void SolveEqs(Cut *cut, count ncut,
-  creal *delta, creal diff)
+  void SolveEqs(Cut *cut, count ncut,
+  ctreal *delta, ctreal diff)
 {
   real last = 0;
   real r = 1;
@@ -125,8 +129,8 @@ static inline void SolveEqs(Cut *cut, count ncut,
   last = Div(c->lhs - last, r);
 
   for( ; c >= cut; last += (--c)->lhs ) {
-    creal delmin = -(c->delta = delta[c->i]);
-    creal delmax = FRACT*(delmin + c->save);
+    ctreal delmin = -(c->delta = delta[c->i]);
+    ctreal delmax = FRACT*(delmin + c->save);
     c->sol = Div(last, c->df);
     if( c->sol > delmax ) c->sol = .75*delmax;
     if( c->sol < delmin ) c->sol = .75*delmin;
@@ -135,19 +139,19 @@ static inline void SolveEqs(Cut *cut, count ncut,
 
 /*********************************************************************/
 
-static count FindCuts(Cut *cut, Bounds *bounds, creal vol,
-  real *xmajor, creal fmajor, creal fdiff)
+ count FindCuts(Cut *cut, Bounds *bounds, ctreal vol,
+  real *xmajor, ctreal fmajor, ctreal fdiff)
 {
   cint sign = (fdiff < 0) ? -1 : 1;
 
   count ncut = 0, icut;
   real delta[2*NDIM];
-  real gamma, fgamma, lhssq;
-  count dim, div;
+  real gammaiii, fgamma, lhssq;
+  count dim, diviii;
 
   for( dim = 0; dim < ndim_; ++dim ) {
 //    cBounds *b = &bounds[dim];
-//    creal xsave = xmajor[dim];
+//    ctreal xsave = xmajor[dim];
     cBounds *b;
     real xsave;
     b = &bounds[dim];
@@ -158,7 +162,7 @@ static count FindCuts(Cut *cut, Bounds *bounds, creal vol,
       c->i = Upper(dim);
       c->save = dist;
       xmajor[dim] += dist *= FRACT;
-      c->f = Sample(xmajor);
+      c->f = divonneSample(xmajor);
       xmajor[dim] = xsave;
     }
     delta[Upper(dim)] = dist;
@@ -166,14 +170,14 @@ static count FindCuts(Cut *cut, Bounds *bounds, creal vol,
 
   for( dim = 0; dim < ndim_; ++dim ) {
     cBounds *b = &bounds[dim];
-    creal xsave = xmajor[dim];
+    ctreal xsave = xmajor[dim];
     real dist = xsave - b->lower;
     if( dist >= BNDTOL*(b->upper - b->lower) ) {
       Cut *c = &cut[ncut++];
       c->i = Lower(dim);
       c->save = dist;
       xmajor[dim] -= dist *= FRACT;
-      c->f = Sample(xmajor);
+      c->f = divonneSample(xmajor);
       xmajor[dim] = xsave;
     }
     delta[Lower(dim)] = dist;
@@ -190,15 +194,15 @@ static count FindCuts(Cut *cut, Bounds *bounds, creal vol,
 
     for( icut = 0; icut < ncut; ++icut ) {
       Cut *c = &cut[icut];
-      creal diff = fabs(fmajor - c->f);
+      ctreal diff = fabs(fmajor - c->f);
       if( diff <= mindiff ) {
         mindiff = diff;
         mincut = c;
       }
     }
 
-    gamma = Volume(delta)/vol;
-    fgamma = fmajor + (gamma - 1)*fdiff;
+    gammaiii = Volume(delta)/vol;
+    fgamma = fmajor + (gammaiii - 1)*fdiff;
 
     if( sign*(mincut->f - fgamma) < 0 ) break;
 
@@ -220,18 +224,18 @@ static count FindCuts(Cut *cut, Bounds *bounds, creal vol,
   lhssq = SetupEqs(cut, ncut, fgamma);
 
 repeat:
-  SolveEqs(cut, ncut, delta, gamma*fdiff);
+  SolveEqs(cut, ncut, delta, gammaiii*fdiff);
 
-  for( div = 1; div <= 16; div *= 4 ) {
+  for( diviii = 1; diviii <= 16; diviii *= 4 ) {
     real gammanew, lhssqnew;
 
     for( icut = 0; icut < ncut; ++icut ) {
       Cut *c = &cut[icut];
       real *x = &xmajor[Dim(c->i)];
-      creal xsave = *x;
-      delta[c->i] = c->delta + c->sol/div;
+      ctreal xsave = *x;
+      delta[c->i] = c->delta + c->sol/diviii;
       *x += SignedDelta(c->i);
-      c->f = Sample(xmajor);
+      c->f = divonneSample(xmajor);
       *x = xsave;
     }
 
@@ -240,24 +244,24 @@ repeat:
     lhssqnew = SetupEqs(cut, ncut, fgamma);
 
     if( lhssqnew <= lhssq ) {
-      real fmax;
+      real fmaxiii;
 
-      if( fabs(gammanew - gamma) < GAMMATOL*gamma ) break;
-      gamma = gammanew;
+      if( fabs(gammanew - gammaiii) < GAMMATOL*gammaiii ) break;
+      gammaiii = gammanew;
 
-      fmax = fabs(fgamma);
+      fmaxiii = fabs(fgamma);
       for( icut = 0; icut < ncut; ++icut ) {
         Cut *c = &cut[icut];
-        creal dfmin = SINGTOL*c->df;
-        creal sol = c->sol/div;
+        ctreal dfmin = SINGTOL*c->df;
+        ctreal sol = c->sol/diviii;
         real df = c->f - c->fold;
         df = (fabs(sol) < BIG*fabs(df)) ? df/sol : 1;
         c->df = (fabs(df) < fabs(dfmin)) ? dfmin : df;
-        fmax = Max(fmax, fabs(c->f));
+        fmaxiii = Max(fmaxiii, fabs(c->f));
         c->fold = c->f;
       }
 
-      if( lhssqnew < Sq((1 + fmax)*LHSTOL) ) break;
+      if( lhssqnew < Sq((1 + fmaxiii)*LHSTOL) ) break;
       lhssq = lhssqnew;
       goto repeat;
     }
@@ -275,9 +279,9 @@ repeat:
 
 /*********************************************************************/
 
-static void Split(count iregion, int depth)
+ void Split(count iregion, int depth)
 {
-  TYPEDEFREGION;
+  DIVONNETYPEDEFREGION;
 
   Cut cut[2*NDIM];
   Errors errors[NCOMP];
@@ -308,11 +312,11 @@ static void Split(count iregion, int depth)
     for( c = cut; ncut--; ++c ) {
       real *b = (real *)region_[iregion].bounds;
       ccount c0 = c->i, c1 = c0 ^ 1;
-      creal tmp = b[c1];
+      ctreal tmpi = b[c1];
       b[c1] = b[c0];
       b[c0] = c->save;
       if( !Explore(iregion, &samples_[0], depth++, ncut != 0) ) break;
-      if( ncut ) ((real *)region_[iregion].bounds)[c1] = tmp;
+      if( ncut ) ((real *)region_[iregion].bounds)[c1] = tmpi;
     }
   }
 
@@ -343,11 +347,11 @@ static void Split(count iregion, int depth)
     for( comp = 0; comp < ncomp_; ++comp ) {
       Result *r = &result[comp];
       cErrors *e = &errors[comp];
-      creal c = tmp*e->diff;
+      ctreal c = tmp*e->diff;
       if( r->err > 0 ) r->err = r->err*e->err + c;
       r->spread = r->spread*e->spread + c*samples_[0].neff;
     }
   }
 }
 
-#endif
+

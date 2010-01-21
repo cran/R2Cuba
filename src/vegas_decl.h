@@ -33,6 +33,6 @@ typedef struct {
 
 typedef const Cumulants cCumulants;
 
-typedef void (*Integrand)(ccount *, creal *, ccount *,   creal *lower, creal *upper, creal prdbounds,  real *,creal *);
+typedef void (*Integrand)(ccount *, ctreal *, ccount *,   ctreal *lower, ctreal *upper, ctreal prdbounds,  real *,ctreal *);
 
 #endif

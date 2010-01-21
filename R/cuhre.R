@@ -14,7 +14,7 @@ cuhre <- function(ndim, ncomp,
   {
 
      # Verification
- if (!verif(ndim, lower, upper, rel.tol, abs.tol,
+ if (!verif(ndim, ncomp, lower, upper, rel.tol, abs.tol,
             flags, min.eval,  max.eval))
       stop("Error in input: see the warnings")
  if (is.null(flags$mersenne.seed))

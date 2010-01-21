@@ -50,7 +50,7 @@ vegas <- function(ndim, ncomp,
                   nbatch=1000, gridno=0, state.file=NULL)
   {
      # Verification
-if (!verif(ndim, lower, upper, rel.tol, abs.tol,
+if (!verif(ndim, ncomp, lower, upper, rel.tol, abs.tol,
             flags, min.eval,  max.eval) ||
     !verifvegas( nstart, nincrease, nbatch, gridno, state.file))
       stop("Error in input: see the warnings")

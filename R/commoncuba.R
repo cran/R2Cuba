@@ -1,15 +1,19 @@
 # ++++++++++++++++++++++++++++++++++++++++++
 # Functions shared by all the R2Cuba functions
 # ++++++++++++++++++++++++++++++++++++++++++
-verif <- function(ndim, lower, upper, rel.tol, abs.tol,
+verif <- function(ndim, ncomp, lower, upper, rel.tol, abs.tol,
             flags, min.eval,  max.eval) {
   # Verification of the input arguments
   # Issue a warning for each error and return T if none
   bon <- TRUE
 
-  if (ndim<=0) {
+  if ( (ndim >40) || (ndim<=0)) {
     bon <- FALSE
-      warning("ndim should be positive")
+      warning("ndim should be positive and less or equal to 40")
+  }
+  if ( (ncomp >10) || (ncomp<=0)) {
+    bon <- FALSE
+      warning("ncomp should be positive and less or equal to 10")
   }
 
   if ((length(lower) != ndim) ||

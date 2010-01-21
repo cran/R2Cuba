@@ -1,7 +1,3 @@
-#ifndef __divonne_explore_h__
-#define __divonne_explore_h__
-
-//Compilation note for R interface: move Explore.c into divonne_Explore.h
 /*
 	Explore.c
 		sample region, determine min and max, split if necessary
@@ -9,8 +5,12 @@
 		last modified 25 May 09 th
 */
 
-//Compilation note for R interface: add include
 #include "divonne_decl.h"
+#include "divonne_util.h"
+extern void Split(count iregion, int depth);
+extern real FindMinimum(cBounds *b, real *xmin, real fminiii);
+extern count SampleExtra( cBounds *b);
+/*********************************************************************/
 
 typedef struct {
   real fmin, fmax;
@@ -19,12 +19,12 @@ typedef struct {
 
 /*********************************************************************/
 
-static bool Explore(count iregion, cSamples *samples, cint depth, cint flags)
+ bool Explore(count iregion, cSamples *samples, cint depth, cint flags)
 {
 #define SPLICE (flags & 1)
 #define HAVESAMPLES (flags & 2)
 
-  TYPEDEFREGION;
+  DIVONNETYPEDEFREGION;
 
   count n, dim, comp, maxcomp;
   Extrema extrema[NCOMP];
@@ -67,9 +67,9 @@ static bool Explore(count iregion, cSamples *samples, cint depth, cint flags)
     region->vol = vol;
 
     for( comp = 0; comp < ncomp_; ++comp ) {
-      Result *r = &result[comp];
-      r->fmin = INFTY;
-      r->fmax = -INFTY;
+      Result *ri = &result[comp];
+      ri->fmin = INFTY;
+      ri->fmax = -INFTY;
     }
 
     x = xgiven_;
@@ -86,7 +86,7 @@ static bool Explore(count iregion, cSamples *samples, cint depth, cint flags)
 
       for( comp = 0; comp < ncomp_; ++comp ) {
         Extrema *e = &extrema[comp];
-        creal y = f[comp];
+        ctreal y = f[comp];
         if( y < e->fmin ) e->fmin = y, e->xmin = x;
         if( y > e->fmax ) e->fmax = y, e->xmax = x;
       }
@@ -103,7 +103,7 @@ skip:
   for( n = samples->n; n; --n ) {
     for( comp = 0; comp < ncomp_; ++comp ) {
       Extrema *e = &extrema[comp];
-      creal y = *f++;
+      ctreal y = *f++;
       if( y < e->fmin ) e->fmin = y, e->xmin = x;
       if( y > e->fmax ) e->fmax = y, e->xmax = x;
     }
@@ -117,7 +117,7 @@ skip:
 
   for( comp = 0; comp < ncomp_; ++comp ) {
     Extrema *e = &extrema[comp];
-    Result *r = &result[comp];
+    Result *ri = &result[comp];
     real xtmp[NDIM], ftmp, err;
 
     if( e->xmin ) {	/* not all NaNs */
@@ -126,25 +126,25 @@ skip:
       sign_ = 1;
       VecCopy(xtmp, e->xmin);
       ftmp = FindMinimum(bounds, xtmp, e->fmin);
-      if( ftmp < r->fmin ) {
-        r->fmin = ftmp;
-        VecCopy(r->xmin, xtmp);
+      if( ftmp < ri->fmin ) {
+        ri->fmin = ftmp;
+        VecCopy(ri->xmin, xtmp);
       }
 
       sign_ = -1;
       VecCopy(xtmp, e->xmax);
       ftmp = -FindMinimum(bounds, xtmp, -e->fmax);
-      if( ftmp > r->fmax ) {
-        r->fmax = ftmp;
-        VecCopy(r->xmax, xtmp);
+      if( ftmp > ri->fmax ) {
+        ri->fmax = ftmp;
+        VecCopy(ri->xmax, xtmp);
       }
     }
 
-    r->avg = samples->avg[comp];
-    r->err = samples->err[comp];
-    r->spread = halfvol*(r->fmax - r->fmin);
+    ri->avg = samples->avg[comp];
+    ri->err = samples->err[comp];
+    ri->spread = halfvol*(ri->fmax - ri->fmin);
 
-    err = r->spread/Max(fabs(r->avg), NOTZERO);
+    err = ri->spread/Max(fabs(ri->avg), NOTZERO);
     if( err > maxerr ) {
       maxerr = err;
       maxcomp = comp;
@@ -186,4 +186,4 @@ skip:
   return true;
 }
 
-#endif
+

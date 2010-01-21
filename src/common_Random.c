@@ -1,6 +1,3 @@
-#ifndef __random_h__
-#define  __random_h__
-// Compilation note for R interface: move Random.c into Random.h
 /*
 	Random.c
 		quasi- and pseudo-random-number generation
@@ -12,18 +9,18 @@
 	PART 1: Sobol quasi-random-number generator
 	adapted from ACM TOMS algorithm 659
 */
+#include "common_stddecl.h"
 
-#define SOBOL_MINDIM 1
-#define SOBOL_MAXDIM 40
 
-static struct {
+
+extern struct {
   real norm;
   number v[SOBOL_MAXDIM][30], prev[SOBOL_MAXDIM];
   number seq;
 } sobol_;
 
 
-static inline void SobolIni(cnumber n)
+static inline void SobolIni(cnumber n, count ndim)
 {
   static number ini[9*40] = {
       3,   1,   0,   0,   0,   0,   0,   0,   0,
@@ -69,24 +66,26 @@ static inline void SobolIni(cnumber n)
   count dim, bit, nbits;
   number max, *pini = ini;
 
+
   for( nbits = 0, max = 1; max <= n; max <<= 1 ) ++nbits;
   sobol_.norm = 1./max;
 
   for( bit = 0; bit < nbits; ++bit )
     sobol_.v[0][bit] = (max >>= 1);
 
-  for( dim = 1; dim < ndim_; ++dim ) {
+  for( dim = 1; dim < ndim; ++dim ) {
     number *pv = sobol_.v[dim], *pvv = pv;
     number powers = *pini++, j;
-    int inibits = -1, bit;
+    int inibits = -1;
     for( j = powers; j; j >>= 1 ) ++inibits;
 
     memcpy(pv, pini, inibits*sizeof(*pini));
     pini += 8;
 
     for( bit = inibits; bit < nbits; ++bit ) {
-      number newv = *pvv, j = powers;
+      number newv = *pvv;
       int b;
+      j = powers;
       for( b = 0; b < inibits; ++b ) {
         if( j & 1 ) newv ^= pvv[b] << (inibits - b);
         j >>= 1;
@@ -100,11 +99,12 @@ static inline void SobolIni(cnumber n)
   }
 
   sobol_.seq = 0;
-  VecClear(sobol_.prev);
+  Clear(sobol_.prev, ndim);
+
 }
 
 
-static inline void SobolGet(real *x)
+static inline void SobolGet(real *x, count ndim)
 {
   number seq = sobol_.seq++;
   count zerobit = 0, dim;
@@ -114,15 +114,16 @@ static inline void SobolGet(real *x)
     seq >>= 1;
   }
 
-  for( dim = 0; dim < ndim_; ++dim ) {
+  for( dim = 0; dim < ndim; ++dim ) {
     sobol_.prev[dim] ^= sobol_.v[dim][zerobit];
     x[dim] = sobol_.prev[dim]*sobol_.norm;
   }
 }
 
 
-static inline void SobolSkip(number n)
+static inline void SobolSkip(number n, count ndim)
 {
+
   while( n-- ) {
     number seq = sobol_.seq++;
     count zerobit = 0, dim;
@@ -132,7 +133,7 @@ static inline void SobolSkip(number n)
       seq >>= 1;
     }
 
-    for( dim = 0; dim < ndim_; ++dim )
+    for( dim = 0; dim < ndim; ++dim )
       sobol_.prev[dim] ^= sobol_.v[dim][zerobit];
   }
 }
@@ -144,23 +145,15 @@ static inline void SobolSkip(number n)
 	http://www.math.sci.hiroshima-u.ac.jp/~m-mat/MT/emt.html
 */
 
-/* length of state vector */
-#define MERSENNE_N 624
-
-/* period parameter */
-#define MERSENNE_M 397
-
-/* 32 or 53 random bits */
-#define RANDOM_BITS 32
 
 typedef unsigned int state_t;
 
-static struct {
+extern struct {
   state_t state[MERSENNE_N];
   count next;
 } mersenne_;
 
-unsigned int SUFFIX(mersenneseed);
+extern unsigned int SUFFIX(mersenneseed);
 
 
 static inline state_t Twist(state_t a, state_t b)
@@ -215,11 +208,11 @@ static inline state_t MersenneInt(count next)
 }
 
 
-static inline void MersenneGet(real *x)
+static inline void MersenneGet(real *x, count ndim)
 {
   count next = mersenne_.next, dim;
 
-  for( dim = 0; dim < ndim_; ++dim ) {
+  for( dim = 0; dim < ndim; ++dim ) {
 #if RANDOM_BITS == 53
     state_t a, b;
 #endif
@@ -242,12 +235,12 @@ static inline void MersenneGet(real *x)
 }
 
 
-static inline void MersenneSkip(number n)
+static inline void MersenneSkip(number n, count ndim)
 {
 #if RANDOM_BITS == 53
-  n = 2*n*ndim_ + mersenne_.next;
+  n = 2*n*ndim + mersenne_.next;
 #else
-  n = n*ndim_ + mersenne_.next;
+  n = n*ndim + mersenne_.next;
 #endif
   mersenne_.next = n % MERSENNE_N;
   n /= MERSENNE_N;
@@ -259,34 +252,33 @@ static inline void MersenneSkip(number n)
 	PART 3: User routines:
 
 	- IniRandom sets up the random-number generator to produce a
-	  sequence of at least n ndim_-dimensional random vectors.
+	  sequence of at least n ndim-dimensional random vectors.
 
 	- GetRandom retrieves one random vector.
 
 	- SkipRandom skips over n random vectors.
 */
 
-static void IniRandom(cnumber n, cint flags)
+ void IniRandom(cnumber n, cint flags, count ndim)
 {
-
-
   if( PSEUDORNG ) {
     sobol_.seq = -1;
     MersenneIni();
   }
-  else SobolIni(n);
+  else SobolIni(n, ndim);
+
 }
 
-static inline void GetRandom(real *x)
+ void GetRandom(real *x, count ndim)
 {
-  if( sobol_.seq == -1 ) MersenneGet(x);
-  else SobolGet(x);
+ 
+  if( sobol_.seq == -1 ) MersenneGet(x, ndim);
+  else SobolGet(x, ndim);
 }
 
-static inline void SkipRandom(cnumber n)
+ void SkipRandom(cnumber n, count ndim)
 {
-  if( sobol_.seq == -1 ) MersenneSkip(n);
-  else SobolSkip(n);
+  if( sobol_.seq == -1 ) MersenneSkip(n,  ndim);
+  else SobolSkip(n,  ndim);
 }
 
-#endif

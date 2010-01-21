@@ -1,5 +1,3 @@
-//Compilation note for R interface: move into a .h
-//Compilation note for R interface: add ifndef
 #ifndef __vegas_util_h__
 #define __vegas_util_h__
 /*
@@ -11,17 +9,14 @@
 
 
 #include "vegas_decl.h"
+/* globals */
+ Integrand integrand_;
+ count ndim_, ncomp_;
+ number neval_;
 
-static count ndim_, ncomp_;
-static number neval_;
-static Grid *gridptr_[MAXGRIDS];
-static count griddim_[MAXGRIDS];
-/* Compilation note for R interface: remove
- int EXPORT(vegasnbatch) = 1000;
- int EXPORT(vegasgridno) = 0;*/
-int EXPORT(vegasnbatch);
-int EXPORT(vegasgridno);
-char EXPORT(vegasstate)[MAXSTATESIZE] = "";
+
+ Grid *gridptr_[MAXGRIDS];
+ count griddim_[MAXGRIDS];
 
 
 #define SamplesAlloc(p, n) \

@@ -1,4 +1,4 @@
-#dyn.load("../src/cuba.so");source("../R/vegas.R"); source("../R/commoncuba.R")
+#dyn.load("../src/R2Cuba.so");source("../R/vegas.R"); source("../R/commoncuba.R")
 library("R2Cuba")
 
 # DEMO EXAMPLES

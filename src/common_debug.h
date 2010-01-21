@@ -39,7 +39,7 @@ static inline void DEBClose()
 #define DEB(...) fprintf(DEBFile, __VA_ARGS__); fflush(DEBFile)
 
 
-static inline void DEBVec(const char *s, creal *d)
+static inline void DEBVec(const char *s, ctreal *d)
 {
   char space[strlen(s) + 2];
   count dim;
