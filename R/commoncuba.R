@@ -62,7 +62,7 @@ decodflags <- function(flags) {
     if (!is.null(flags$verbose))
       lesflags <- flags$verbose
     else
-      lesflags <- 1 # valeur par défaut
+      lesflags <- 1 # default value
     if (!is.null(flags$final))
       lesflags <- lesflags + (flags$final*4)
     if (!is.null(flags$pseudo.random))
@@ -85,12 +85,8 @@ crff <- function(lecall, integrand, nomf, libargs, ...) {
    stop("Function integrand should have one argument at least")
  
  # nargsup:  number of additional arguments in the current call
- a <- deparse(lecall, width=500)
- # Mettre les arguments courants dans une liste
- zl <- NULL
- eval(parse(text= sub(nomf, "zl<-list", a)))
-# determiner ceux additionnels
- a <- (names(zl) %in% libargs)
+ zl <- names(lecall)[-1]
+ a <- zl %in% libargs # arguments only for the integration algorithm
  nargsup <- length(a[a==FALSE])
  
  if (nargsup >0) {

@@ -19,8 +19,10 @@ cuhre(ndim, ncomp, integrand, ...,
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{ndim}{ the number of dimensions of the integral}
-  \item{ncomp}{ the number of components  of the integrand}
+  \item{ndim}{ the number of dimensions of the integral. It should be
+    less or equal to 40.}
+  \item{ncomp}{ the number of components  of the integrand. It should be
+    less or equal to 10.}
   \item{integrand}{ the R function which computes the integrand.
     It is expected to be declared as
     
