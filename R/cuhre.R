@@ -67,7 +67,8 @@ cat("\n")
     else
       mess="Dimension out of range"
 
-    retour <- list(neval=ret$neval, nregions=ret$nregions,
+    retour <- list(method="cuhre",
+                   neval=ret$neval, nregions=ret$nregions,
                    ifail=ret$fail, value=ret$integral,
                 abs.error=ret$error,
                    neval=ret$neval,

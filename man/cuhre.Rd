@@ -91,6 +91,7 @@ the degree-11 rule in 3 dimensions, and the degree-9 rule otherwise.}
 }
 \value{
   A list of the S3-class \code{cuba} with components:
+  \item{method }{ here, \dQuote{cuhre}}
   \item{nregions }{the actual number of subregions needed.}
   \item{neval }{the actual number of integrand evaluations needed.}
   \item{ifail}{ an error flag:

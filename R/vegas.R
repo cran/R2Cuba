@@ -119,7 +119,8 @@ cat("\n")
     else
       mess="Dimension out of range"
 
-    retour <- list(neval=ret$neval,
+    retour <- list(method="vegas",
+                   neval=ret$neval,
                    ifail=ret$fail, value=ret$integral,
                 abs.error=ret$error,
                    neval=ret$neval,

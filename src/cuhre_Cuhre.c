@@ -74,7 +74,6 @@ if  (length(resultsxp) != *ncomp)
   else {
     neval_ = 0;
     integrand_ = integrand;
-
     *pfail = cuhreIntegrate( epsrel, Max(epsabs, NOTZERO),
       flags, mineval, maxeval, key,
       integral, erreur, prob);

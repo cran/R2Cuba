@@ -55,6 +55,8 @@ PROTECT(argw=allocVector(REALSXP, (1 )));
      according to the bounds */
   for (i =0; i<*ndim; i++) 
     REAL(args)[i] = xx[i] * (upper[i] - lower[i]) + lower[i];
+
+
   REAL(argw)[ 0]=*weight; 
 
   /* Call the R function */
@@ -72,7 +74,6 @@ if  (length(resultsxp) != *ncomp)
  for (i =0; i<*ncomp;  i++) {
    ff[i] = REAL(resultsxp)[i] * prdbounds;
  }
-
 
 
 } // End RIntegrand

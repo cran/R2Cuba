@@ -129,8 +129,11 @@ print.cuba <-
              cat("; probability: ", format(x$prob, ...), "\n")
 
               if (x$message !="OK") 
-         cat("failed with message ", sQuote(x$message), "\n", 
-        sep = "")
+         cat("failed with message ", sQuote(x$message), "\n")
+                if ((x$ifail >1) && (x$method=="divonne")) {
+                cat(" Divonne has estimated the number of points by which max.eval needs to be increased to reach the desired accuracy. It is", x$ifail,  "\n")
+              }
+                  
     invisible(x)
 
           }

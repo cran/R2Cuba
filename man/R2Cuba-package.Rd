@@ -12,8 +12,8 @@
 \details{
 \tabular{ll}{
 Package: \tab R2Cuba\cr
-Version: \tab 1.0-0\cr
-Date: \tab 2010-01-01\cr
+Version: \tab 1.0-5\cr
+Date: \tab 2010-09-01\cr
 Depends: \tab methods, stats\cr
 License: \tab GPL (>= 3)\cr}}
 \author{
