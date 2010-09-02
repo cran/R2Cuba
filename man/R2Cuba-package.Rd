@@ -12,9 +12,10 @@
 \details{
 \tabular{ll}{
 Package: \tab R2Cuba\cr
-Version: \tab 1.0-5\cr
-Date: \tab 2010-09-01\cr
-Depends: \tab methods, stats\cr
+Version: \tab 1.0-6\cr
+Date: \tab 2010-09-02\cr
+Depends: \tab methods\cr
+Suggests:\tab deldir\cr
 License: \tab GPL (>= 3)\cr}}
 \author{
   The Cuba library has been written by Thomas Hahn
