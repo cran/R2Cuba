@@ -95,8 +95,7 @@ we cannot use the R function "error" because
 of names conflict with a variable of same name in the files
 which include this file */
 #define ChkAlloc(r) if( r == NULL ) { \
-     REprintf( "Out of memory in " __FILE__ " line %d.\n", __LINE__); \
-     exit(1); \
+     error( "Out of memory in " __FILE__ " line %d.\n", __LINE__); \
 }
 
 #define Alloc(p, n) MemAlloc(p, (n)*sizeof(*p))

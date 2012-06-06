@@ -47,7 +47,9 @@ if (is.null(flags$mersenne.seed))
    stop("nextra positive but not peakfinder subroutine")
  if ((nextra==0) && !is.null(peakfinder))
    warning("peakfinder ignored: nextra is zero")
- 
+# 6/6/2012
+ if (is.null(peakfinder))
+   peakfinder=0
  
   
        # Allocate outputs

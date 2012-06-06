@@ -12,8 +12,6 @@
 \details{
 \tabular{ll}{
 Package: \tab R2Cuba\cr
-Version: \tab 1.0-6\cr
-Date: \tab 2010-09-02\cr
 Depends: \tab methods\cr
 Suggests:\tab deldir\cr
 License: \tab GPL (>= 3)\cr}}

@@ -7,7 +7,7 @@
   of this package.
 }
 \usage{
-print.cuba(x,  ...)
+\method{print}{cuba}(x, \dots)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
