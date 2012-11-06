@@ -89,8 +89,7 @@ if (is.null(flags$mersenne.seed))
              integral=as.double(integral),
              error=as.double(error), prob=as.double(prob),
              NAOK=TRUE)
-#Add to finish the last print:
-cat("\n")
+#Add to finish the last print:cat("\n")
 
 # To homogeneize with the R function "integrate", add
     # message and call into the output,

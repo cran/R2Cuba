@@ -1,7 +1,8 @@
 
-R version 2.8.1 (2008-12-22)
-Copyright (C) 2008 The R Foundation for Statistical Computing
+R version 2.15.0 (2012-03-30)
+Copyright (C) 2012 The R Foundation for Statistical Computing
 ISBN 3-900051-07-0
+Platform: x86_64-unknown-linux-gnu (64-bit)
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
 You are welcome to redistribute it under certain conditions.
@@ -56,7 +57,6 @@ Iteration 2:  381 integrand evaluations so far
 integral: 0.6646697 (+-3.3e-11)
 nregions: 2; number of evaluations:  381; probability:  0 
 >  cuhre(NDIM, NCOMP,  integrand,  flags= list(pseudo.random=1))
-
 Iteration 1:  127 integrand evaluations so far
 [1] 0.66467 +- 7.2682e-10  	chisq 0 (0 df)
 Iteration 2:  381 integrand evaluations so far
@@ -104,3 +104,6 @@ integral: 0.6646697 (+-3.3e-11)
 nregions: 2; number of evaluations:  381; probability:  0 
 > 
 > 
+> proc.time()
+   user  system elapsed 
+  0.156   0.023   0.173 

@@ -166,7 +166,7 @@ next:
       cBounds *b = &region->bounds[dim];
       // Rescale the region bounds
       p += sprintf(p,
-        (dim == 0) ? "\nRegion (" REALF ") - (" REALF ")" :
+        (dim == 0) ? "Region (" REALF ") - (" REALF ")" :
                      "\n       (" REALF ") - (" REALF ")",
 		   RESCALE(b->lower,dim),  RESCALE(b->upper,dim));
     }
@@ -174,7 +174,8 @@ next:
     for( comp = 0; comp < ncomp_; ++comp ) {
       cResult *r = &region->result[comp];
       p += sprintf(p, "\n[" COUNT "] "
-        REEL " +- " REEL, comp + 1, r->avg, r->err);
+		   REEL " +- " REEL "\n",
+		   comp + 1, r->avg, r->err);
     }
 
     Print(si);

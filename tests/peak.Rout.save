@@ -1,7 +1,8 @@
 
-R version 2.8.1 (2008-12-22)
-Copyright (C) 2008 The R Foundation for Statistical Computing
+R version 2.15.0 (2012-03-30)
+Copyright (C) 2012 The R Foundation for Statistical Computing
 ISBN 3-900051-07-0
+Platform: x86_64-unknown-linux-gnu (64-bit)
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
 You are welcome to redistribute it under certain conditions.
@@ -45,7 +46,6 @@ Type 'q()' to quit R.
 + } #end peakf
 > 
 > print(divonne(NDIM, NCOMP, integrand, flags=list(verbose=0) , peakfinder=peakf, nextra=NMAX))
-
 integral: 0.6646195 (+-0.00064)
 nregions: 14; number of evaluations:  3136; probability:  1.110223e-16 
 > 
@@ -77,9 +77,11 @@ nregions: 14; number of evaluations:  3136; probability:  1.110223e-16
 > print(divonne(NDIM, NCOMP, integrand2, lower=c(3,2,1), upper=c(4,3,2),
 +                flags=list(verbose=0) ,
 +                 peakfinder=peakf, nextra=NMAX))
-
 integral: 0.6646195 (+-0.00064)
 nregions: 14; number of evaluations:  3136; probability:  1.110223e-16 
 > 
 >   
 > 
+> proc.time()
+   user  system elapsed 
+  0.197   0.015   0.204 

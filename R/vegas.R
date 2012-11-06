@@ -87,7 +87,6 @@ if (is.null(state.file))
 
     
   prdbounds <- prod(upper-lower)
-
   ret <-  .C("Rvegas", as.integer(ndim),
              as.integer(ncomp),
              ffintegrand, new.env(),
@@ -105,8 +104,7 @@ if (is.null(state.file))
              integral=as.double(integral),
              error=as.double(error), prob=as.double(prob),
              NAOK=TRUE)
-#Add to finish the last print:
-cat("\n")
+#Add to finish the last print:cat("\n")
 
 # To homogeneize with the R function "integrate", add
     # message and call into the output,

@@ -53,8 +53,7 @@ cuhre <- function(ndim, ncomp,
              integral=as.double(integral),
              error=as.double(error), prob=as.double(prob),
                NAOK=TRUE)
-#Add to finish the last print:
-cat("\n")
+#Add to finish the last print:cat("\n") AB remove : 5/11/12
 
 # To homogeneize with the R function "integrate", add
     # message and call into the output,

@@ -52,7 +52,7 @@ extern void decodflags(cint flags,
       "  ndim " COUNT "\n  ncomp " COUNT "\n"
       "  rel.tol " REEL "\n  abs.tol " REEL "\n"
       "  smooth %d\n  pseudo.random  %d\n  final %d\n  verbose %d\n  min.eval " NUMBER "\n  max.eval " NUMBER "\n"
-      "  nnew " NUMBER "\n  flatness " REEL,
+      "  nnew " NUMBER "\n  flatness " REEL "\n",
       ndim_, ncomp_,
       epsrel, epsabs,
       smooth, pseudorandom, final, verbose, mineval, maxeval,
@@ -102,14 +102,14 @@ extern void decodflags(cint flags,
     if( VERBOSE ) {
       char s[128 + 128*NCOMP], *p = s;
 
-      p += sprintf(p, "\n"
+      p += sprintf(p,
         "Iteration " COUNT ":  " NUMBER " integrand evaluations so far",
         nregions_, neval_);
 
       for( comp = 0; comp < ncomp_; ++comp ) {
         cResult *tot = &totals[comp];
         p += sprintf(p, "\n[" COUNT "] " 
-          REEL " +- " REEL "  \tchisq " REEL " (" COUNT " df)",
+          REEL " +- " REEL "  \tchisq " REEL " (" COUNT " df)\n",
           comp + 1, tot->avg, tot->err, tot->chisq, df);
       }
 

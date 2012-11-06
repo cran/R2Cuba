@@ -1,7 +1,8 @@
 
-R version 2.8.1 (2008-12-22)
-Copyright (C) 2008 The R Foundation for Statistical Computing
+R version 2.15.0 (2012-03-30)
+Copyright (C) 2012 The R Foundation for Statistical Computing
 ISBN 3-900051-07-0
+Platform: x86_64-unknown-linux-gnu (64-bit)
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
 You are welcome to redistribute it under certain conditions.
@@ -40,7 +41,6 @@ Type 'q()' to quit R.
 > vegas(NDIM, NCOMP, integrand,
 +                   rel.tol=EPSREL,  abs.tol=EPSABS,
 +              flags=list(verbose=VERBOSE))
-
 integral: 0.6648107 (+-0.00049)
 number of evaluations:  10000; probability:  0.08870493 
 > # ----------------------------------------
@@ -57,7 +57,6 @@ number of evaluations:  10000; probability:  0.08870493
 > vegas(NDIM, NCOMP, integrandp, digits=1,
 +                   rel.tol=EPSREL,  abs.tol=EPSABS,
 +              flags=list(verbose=0))
-
 integral: 0.6648107 (+-0.00049)
 number of evaluations:  10000; probability:  0.08870493 
 > # ----------------------------------------
@@ -65,24 +64,21 @@ number of evaluations:  10000; probability:  0.08870493
 > vegas(NDIM, NCOMP, integrand,
 +                   rel.tol=1e-50,  abs.tol=1e-50,
 +              flags=list(verbose=VERBOSE), state.file="toto")
-
-integral: 0.6647079 (+-0.00015)
-number of evaluations:  52000; probability:  0.01204850 
-failed with message 'Dimension out of range'
+integral: 0.6646931 (+-0.00013)
+number of evaluations:  67500; probability:  0.005078484 
+failed with message  'Dimension out of range' 
 > 
 > vegas(NDIM, NCOMP, integrand,
 +                    rel.tol=EPSREL,  abs.tol=EPSABS,
 +              flags=list(verbose=VERBOSE), state.file="toto")
-
-integral: 0.6646798 (+-0.00014)
-number of evaluations:  59500; probability:  0.01606268 
+integral: 0.6646589 (+-0.00012)
+number of evaluations:  76000; probability:  0.01009976 
 > 
 > # ----------------------------------------
 > # Essai avec mersenne
 > vegas(NDIM, NCOMP, integrand,
 +   rel.tol=EPSREL,  abs.tol=EPSABS,
 +       flags=list(verbose=0, pseudo.random=1, mersenne.seed=10))
-
 integral: 0.6640216 (+-0.00065)
 number of evaluations:  13500; probability:  0.07234709 
 > 
@@ -91,7 +87,6 @@ number of evaluations:  13500; probability:  0.07234709
 > vegas(NDIM, NCOMP, integrand,
 +                   rel.tol=EPSREL,  abs.tol=EPSABS,
 +              flags=list(verbose=0, vegas.nbatch=500))
-
 integral: 0.6648107 (+-0.00049)
 number of evaluations:  10000; probability:  0.08870493 
 > # ----------------------------------------
@@ -115,11 +110,9 @@ Vegas input parameters:
   nstart 1000
   nincrease 500
   vegas.gridno 0
-  vegas.state "toto"
-
+  vegas.state ""
 Iteration 1:  1000 integrand evaluations so far
 [1] 0.666187 +- 0.014126  	chisq 0 (0 df)
-Saving state to toto.
 Iteration 2:  2500 integrand evaluations so far
 [1] 0.663884 +- 0.0048976  	chisq 0.0302145 (1 df)
 Iteration 3:  4500 integrand evaluations so far
@@ -136,14 +129,15 @@ number of evaluations:  13500; probability:  0.07234709
 +                   rel.tol=EPSREL,  abs.tol=EPSABS,
 +              flags=list(verbose=0, pseudo.random=1, mersenne.seed=10,
 +                vegas.gridno=4))
-
 integral: 0.6640216 (+-0.00065)
 number of evaluations:  13500; probability:  0.07234709 
 > vegas(NDIM, NCOMP, integrand,
 +                   rel.tol=EPSREL,  abs.tol=EPSABS,
 +              flags=list(verbose=0, pseudo.random=1, mersenne.seed=10,
 +                vegas.gridno=-4))
-
 integral: 0.6640216 (+-0.00065)
 number of evaluations:  13500; probability:  0.07234709 
 > 
+> proc.time()
+   user  system elapsed 
+  0.612   0.023   0.629 

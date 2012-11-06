@@ -192,14 +192,14 @@ R_CheckUserInterrupt(); // permettre a l'utilisateur d'interrompre
     if( VERBOSE ) {
       char s[128 + 128*NCOMP], *p = s;
 
-      p += sprintf(p, "\n"
+      p += sprintf(p, 
         "Iteration " COUNT ":  " NUMBER " integrand evaluations so far",
         state.niter + 1, neval_);
 
       for( comp = 0; comp < ncomp_; ++comp ) {
         cCumulants *c = &state.cumul[comp];
         p += sprintf(p, "\n[" COUNT "] "
-          REEL " +- " REEL "  \tchisq " REEL " (" COUNT " df)",
+          REEL " +- " REEL "  \tchisq " REEL " (" COUNT " df)\n",
           comp + 1, c->avg, c->err, c->chisq, state.niter);
       }
 
@@ -246,7 +246,7 @@ R_CheckUserInterrupt(); // permettre a l'utilisateur d'interrompre
 
         if( statemsg ) {
           char s[256];
-          sprintf(s, "\nSaving state to %s.", EXPORT(vegasstate));
+          sprintf(s, "\nSaving state to %s.\n", EXPORT(vegasstate));
           Print(s);
           statemsg = false;
         }

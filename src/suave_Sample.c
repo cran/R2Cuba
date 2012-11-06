@@ -168,7 +168,7 @@ typedef struct {
 
     for( comp = 0; comp < ncomp_; ++comp ) {
       cResult *r = &region->result[comp];
-      p += sprintf(p, "%s  \tchisq " REEL " (" COUNT " df)",
+      p += sprintf(p, "%s  \tchisq " REEL " (" COUNT " df)\n",
         p0, r->chisq, df);
       p0 += chars;
     }

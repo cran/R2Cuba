@@ -159,9 +159,9 @@ void Rvegas(int *pndim, int *pncomp,
   rho= (SEXP)(env);
   globf= (SEXP)(integrand);
 
-  if (strlen(*state) >0) {
+  // 5/11/2012  if (strlen(*state) >0) {
     strncpy(vegasstate, *state, 128);
-   }
+// 5/11/2012   }
 
 
   if (NA_INTEGER != *pmersenneseed) 

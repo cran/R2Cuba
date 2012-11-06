@@ -104,7 +104,7 @@ extern void decodflags(cint flags,
 
   /* Step 1: partition the integration region */
 
-  if( VERBOSE ) Print("Partitioning phase:");
+  if( VERBOSE ) Print("Partitioning phase:\n");
 
   if( IsSobol(key1) || IsSobol(key2) || IsSobol(key3) )
     IniRandom(2*maxeval, flags, ndim_);
@@ -161,7 +161,7 @@ extern void decodflags(cint flags,
     if( VERBOSE ) {
       char s[128 + 64*NCOMP], *p = s;
 
-      p += sprintf(p, "\n"
+      p += sprintf(p, 
         "Iteration " COUNT " (pass " COUNT "):  " COUNT " regions\n"
         NUMBER7 " integrand evaluations so far,\n"
         NUMBER7 " in optimizing regions,\n"
@@ -170,7 +170,7 @@ extern void decodflags(cint flags,
 
       for( comp = 0; comp < ncomp_; ++comp )
         p += sprintf(p, "\n[" COUNT "] "
-          REEL " +- " REEL,
+          REEL " +- " REEL "\n",
           comp + 1, integral[comp], erreur[comp]);
 
       Print(s);
@@ -402,7 +402,7 @@ refine:
             REEL " +- " REEL "(" REEL ")",
             comp + 1, Out(samples_[0]), Out(samples_[1]));
           if( todo == 3 ) p += sprintf(p, "\n    "
-            REEL " +- " REEL "(" REEL ")",
+            REEL " +- " REEL "(" REEL ")\n",
             Out(samples_[2]));
           p += sprintf(p, "  \tchisq " REEL, chisq);
         }
@@ -431,7 +431,7 @@ refine:
 
       for( comp = 0; comp < ncomp_; ++comp )
         p += sprintf(p, "\n[" COUNT "] "
-          REEL " +- " REEL "  \tchisq " REEL " (" COUNT " df)",
+          REEL " +- " REEL "  \tchisq " REEL " (" COUNT " df)\n",
           comp + 1, integral[comp], erreur[comp], prob[comp], df);
 
       Print(s);

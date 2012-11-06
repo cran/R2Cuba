@@ -55,7 +55,7 @@ int smooth, pseudorandom, final, verbose;
       "  ndim " COUNT "\n  ncomp " COUNT "\n"
       "  rel.tol " REEL "\n  abs.tol " REEL "\n"
       "  pseudo.random  %d\n  final %d\n  verbose %d\n  min.eval " NUMBER "\n  max.eval " NUMBER "\n"
-      "  key " COUNT,
+      "  key " COUNT "\n",
       ndim_, ncomp_,
       epsrel, epsabs,
       pseudorandom, final, verbose, mineval, maxeval,
@@ -116,14 +116,14 @@ int smooth, pseudorandom, final, verbose;
     if( VERBOSE ) {
       char s[128 + 128*NCOMP], *p = s;
 
-      p += sprintf(p, "\n"
+      p += sprintf(p, 
         "Iteration " COUNT ":  " NUMBER " integrand evaluations so far",
         nregions, neval_);
 
       for( comp = 0; comp < ncomp_; ++comp ) {
         cTotals *tot = &totals[comp];
         p += sprintf(p, "\n[" COUNT "] "
-          REEL " +- " REEL "  \tchisq " REEL " (" COUNT " df)",
+          REEL " +- " REEL "  \tchisq " REEL " (" COUNT " df)\n",
           comp + 1, tot->avg, tot->err, tot->chisq, nregions - 1);
       }
 

@@ -1,7 +1,8 @@
 
-R version 2.11.1 (2010-05-31)
-Copyright (C) 2010 The R Foundation for Statistical Computing
+R version 2.15.0 (2012-03-30)
+Copyright (C) 2012 The R Foundation for Statistical Computing
 ISBN 3-900051-07-0
+Platform: x86_64-unknown-linux-gnu (64-bit)
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
 You are welcome to redistribute it under certain conditions.
@@ -55,7 +56,6 @@ Expected result:
 cuhre
 >  print(cuhre(ndim,ncomp,pat.dist,sigma,
 +     rel.tol=rel.tol,flags=flags))
-
 integral: 49.66281 (+-4.9)
 nregions: 228; number of evaluations:  29575; probability:  0 
 > 
@@ -65,7 +65,6 @@ nregions: 228; number of evaluations:  29575; probability:  0
 vegas
 > print(vegas(ndim,ncomp,pat.dist,sigma,
 +        rel.tol=rel.tol,flags=flags))
-
 integral: 47.76541 (+-4.1)
 number of evaluations:  4500; probability:  0.4055702 
 > #----------------------------------------
@@ -74,7 +73,6 @@ number of evaluations:  4500; probability:  0.4055702
 suave
 > print(suave(ndim,ncomp,pat.dist,sigma,
 +       rel.tol=rel.tol,flags=flags))
-
 integral: 53.83867 (+-4.7)
 nregions: 4; number of evaluations:  4000; probability:  0.005895374 
 > #----------------------------------------
@@ -83,7 +81,6 @@ nregions: 4; number of evaluations:  4000; probability:  0.005895374
 divonne
 > print(divonne(ndim,ncomp,pat.dist,sigma,
 +           rel.tol=rel.tol,flags=flags))
-
 integral: 35.48077 (+-3.3)
 nregions: 32; number of evaluations:  5665; probability:  0.0001540994 
 > #----------------------------------------
@@ -92,7 +89,6 @@ nregions: 32; number of evaluations:  5665; probability:  0.0001540994
 divonne with  xgiven = the centers
 > print(divonne(ndim,ncomp,pat.dist,sigma,xgiven=pattern,
 +                 rel.tol=rel.tol,flags=flags))            
-
 integral: 47.29323 (+-4.5)
 nregions: 29; number of evaluations:  5969; probability:  4.179577e-10 
 > #----------------------------------------
@@ -102,19 +98,24 @@ divonne with  xgiven = the centers and the peaks
 > # Vertices creation:
 > require("deldir")
 Loading required package: deldir
-deldir 0.0-12 
-
-     Please note: The process for determining duplicated points
-     has changed from that used in version 0.0-9 (and previously).
-
+deldir 0.0-21
 > voronoi <- deldir(pattern["x",],pattern["y",],rw=c(0,1,0,1))
+
+     PLEASE NOTE:  The components "delsgs" and "summary" of the 
+     object returned by deldir() are now DATA FRAMES rather than 
+     matrices (as they were prior to release 0.0-18). 
+     See help("deldir").
+ 
+     PLEASE NOTE: The process that deldir() uses for determining
+     duplicated points has changed from that used in version
+     0.0-9 of this package (and previously). See help("deldir").
+
 > vertices <- unique(rbind(as.matrix(voronoi$dirsgs[,1:2]),
 +                          as.matrix(voronoi$dirsgs[,3:4])))
 > # The maxima:
 > peaks <- rbind(vertices,t(pattern))
 > print(divonne(ndim,ncomp,pat.dist,sigma,xgiven=t(peaks),
 +                   rel.tol=rel.tol,flags=flags))             
-
 integral: 47.29323 (+-4.5)
 nregions: 29; number of evaluations:  5898; probability:  4.179575e-10 
 > #----------------------------------------
@@ -133,7 +134,6 @@ divonne with  peakfinder
 > print(divonne(ndim,ncomp,pat.dist,sigma,
 +                           peakfinder=peakfinder,nextra=nrow(peaks),
 +                 rel.tol=rel.tol,flags=flags))            
-
 integral: 47.29323 (+-4.5)
 nregions: 29; number of evaluations:  6279; probability:  4.179575e-10 
 > #----------------------------------------
@@ -141,3 +141,6 @@ nregions: 29; number of evaluations:  6279; probability:  4.179575e-10
 > #----------------------------------------
 > 
 > 
+> proc.time()
+   user  system elapsed 
+ 11.779   0.032  11.835 

@@ -1,0 +1,8 @@
+2012-11-06  Annie Bouvier
+
+	* DESCRIPTION: version is 1.0-8
+
+	* Remove printing of a new line after each result display
+
+	* vegas_Vegas.c: Fix a bug in the affectation of vegasstate
+	

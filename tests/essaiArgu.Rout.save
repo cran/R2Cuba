@@ -1,7 +1,8 @@
 
-R version 2.8.1 (2008-12-22)
-Copyright (C) 2008 The R Foundation for Statistical Computing
+R version 2.15.0 (2012-03-30)
+Copyright (C) 2012 The R Foundation for Statistical Computing
 ISBN 3-900051-07-0
+Platform: x86_64-unknown-linux-gnu (64-bit)
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
 You are welcome to redistribute it under certain conditions.
@@ -60,47 +61,38 @@ Type 'q()' to quit R.
 > # --------------------divonne ------------------------------
 > # plante: sigma manquant dans l'appel : print(divonne(NDIM, NCOMP,  integrand,  flags= list(verbose=0)))
 > print(divonne(NDIM, NCOMP,  integrand2,  flags= list(verbose=0)))
-
 integral: 0.6646195 (+-0.00064)
 nregions: 14; number of evaluations:  3052; probability:  1.110223e-16 
 > print(divonne(NDIM, NCOMP,  integrand3,  flags= list(verbose=0)))
-
 integral: 0.6646195 (+-0.00064)
 nregions: 14; number of evaluations:  3052; probability:  1.110223e-16 
 > # plante: sigma manquant dans l'integrande: print(divonne(NDIM, NCOMP,  integrand2,  flags= list(verbose=0), sigma=1))
 > print(divonne(NDIM, NCOMP,  integrand4,  flags= list(verbose=0), sigma=1))
-
 integral: 0.6646195 (+-0.00064)
 nregions: 14; number of evaluations:  3052; probability:  1.110223e-16 
 > 
 > # --------------------cuhre ------------------------------
 > # plante: sigma manquant dans l'appel : print(cuhre(NDIM, NCOMP,  integrand,  flags= list(verbose=0)))
 > print(cuhre(NDIM, NCOMP,  integrand2,  flags= list(verbose=0)))
-
 integral: 0.6646697 (+-3.3e-11)
 nregions: 2; number of evaluations:  381; probability:  0 
 > print(cuhre(NDIM, NCOMP,  integrand3,  flags= list(verbose=0)))
-
 integral: 0.6646697 (+-3.3e-11)
 nregions: 2; number of evaluations:  381; probability:  0 
 > # plante: sigma manquant dans l'integrande: print(cuhre(NDIM, NCOMP,  integrand2,  flags= list(verbose=0), sigma=1))
 > print(cuhre(NDIM, NCOMP,  integrand4,  flags= list(verbose=0), sigma=1))
-
 integral: 0.6646697 (+-3.3e-11)
 nregions: 2; number of evaluations:  381; probability:  0 
 > print(cuhre(3,1,  integrand4,  flags= list(verbose=0), sigma=1))
-
 integral: 0.6646697 (+-3.3e-11)
 nregions: 2; number of evaluations:  381; probability:  0 
 > 
 > # --------------------suave ------------------------------
 > print(suave(NDIM, NCOMP,  integrand2,  flags= list(verbose=0)))
-
 integral: 0.6647464 (+-0.00061)
 nregions: 6; number of evaluations:  6000; probability:  0.001946077 
 > # --------------------vegas ------------------------------
 > print(vegas(NDIM, NCOMP,  integrand2,  flags= list(verbose=0)))
-
 integral: 0.6648107 (+-0.00049)
 number of evaluations:  10000; probability:  0.08870493 
 > integrandp <- function(arg, weight, ...) {
@@ -117,7 +109,6 @@ number of evaluations:  10000; probability:  0.08870493
 > print(vegas(NDIM, NCOMP, integrandp, digits=1,
 +                   rel.tol=EPSREL,  abs.tol=EPSABS,
 +              flags=list(verbose=0)))
-
 integral: 0.6648107 (+-0.00049)
 number of evaluations:  10000; probability:  0.08870493 
 > # ----------------------------------------
@@ -125,10 +116,9 @@ number of evaluations:  10000; probability:  0.08870493
 > print(vegas(NDIM, NCOMP, integrand4,
 +                   rel.tol=1e-50,  abs.tol=1e-50,
 +              flags=list(verbose=0), state.file="toto"))
-
-integral: 0.6647079 (+-0.00015)
-number of evaluations:  52000; probability:  0.01204850 
-failed with message 'Dimension out of range'
+integral: 0.6646798 (+-0.00014)
+number of evaluations:  59500; probability:  0.008781273 
+failed with message  'Dimension out of range' 
 > print(vegas(NDIM, NCOMP, integrand,
 +                   rel.tol=EPSREL,  abs.tol=EPSABS,
 +              flags=list(verbose=3, pseudo.random=1, mersenne.seed=10,
@@ -147,11 +137,22 @@ Vegas input parameters:
   nstart 1000
   nincrease 500
   vegas.gridno 0
-  vegas.state "toto"
-
-Restoring state from toto.
-Iteration 14:  59500 integrand evaluations so far
-[1] 0.664665 +- 0.000137014  	chisq 4.9055 (13 df)
-integral: 0.6646652 (+-0.00014)
-number of evaluations:  59500; probability:  0.02278525 
+  vegas.state ""
+Iteration 1:  1000 integrand evaluations so far
+[1] 0.666187 +- 0.014126  	chisq 0 (0 df)
+Iteration 2:  2500 integrand evaluations so far
+[1] 0.663884 +- 0.0048976  	chisq 0.0302145 (1 df)
+Iteration 3:  4500 integrand evaluations so far
+[1] 0.6631 +- 0.00224811  	chisq 0.0626448 (2 df)
+Iteration 4:  7000 integrand evaluations so far
+[1] 0.662786 +- 0.00127313  	chisq 0.0914002 (3 df)
+Iteration 5:  10000 integrand evaluations so far
+[1] 0.663624 +- 0.000891107  	chisq 0.942088 (4 df)
+Iteration 6:  13500 integrand evaluations so far
+[1] 0.664022 +- 0.000651656  	chisq 1.3692 (5 df)
+integral: 0.6640216 (+-0.00065)
+number of evaluations:  13500; probability:  0.07234709 
 > 
+> proc.time()
+   user  system elapsed 
+  0.421   0.021   0.438 

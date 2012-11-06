@@ -1,7 +1,8 @@
 
-R version 2.8.1 (2008-12-22)
-Copyright (C) 2008 The R Foundation for Statistical Computing
+R version 2.15.0 (2012-03-30)
+Copyright (C) 2012 The R Foundation for Statistical Computing
 ISBN 3-900051-07-0
+Platform: x86_64-unknown-linux-gnu (64-bit)
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
 You are welcome to redistribute it under certain conditions.
@@ -87,6 +88,7 @@ Iteration 7 (pass 5):  14 regions
     790 in optimizing regions,
     130 in finding cuts
 [1] 0.664816 +- 0.00292074
+
 Main integration on 14 regions with 211 samples per region.
 Region (0.500000) - (1.000000)
        (0.500000) - (1.000000)
@@ -173,7 +175,6 @@ nregions: 14; number of evaluations:  3052; probability:  1.110223e-16
 + return(ff)
 + } # fin integrandp
 > divonne(NDIM, NCOMP,  integrandp, quote=FALSE, flags=list(verbose=0))
-
 integral: 0.6646195 (+-0.00064)
 nregions: 14; number of evaluations:  3052; probability:  1.110223e-16 
 > 
@@ -243,6 +244,7 @@ Iteration 7 (pass 5):  14 regions
     790 in optimizing regions,
     130 in finding cuts
 [1] 0.664816 +- 0.00292074
+
 Main integration on 14 regions with 211 samples per region.
 Region (3.500000) - (4.000000)
        (2.500000) - (3.000000)
@@ -325,7 +327,6 @@ nregions: 14; number of evaluations:  3052; probability:  1.110223e-16
 > divonne(NDIM, NCOMP, integrand,
 +   rel.tol=EPSREL,  abs.tol=EPSABS,
 +       flags=list(verbose=0, pseudo.random=1, mersenne.seed=10))
-
 integral: 0.6646195 (+-0.00064)
 nregions: 14; number of evaluations:  3052; probability:  1.110223e-16 
 > # ---------------------------------------------------------------
@@ -364,43 +365,51 @@ Iteration 1 (pass 0):  8 regions
     790 in optimizing regions,
      64 in finding cuts
 [1] 0.66501 +- 0.00489722
+
 [2] 0.307908 +- 0.00230089
 Iteration 2 (pass 0):  9 regions
    1382 integrand evaluations so far,
     900 in optimizing regions,
      74 in finding cuts
 [1] 0.664956 +- 0.00433088
+
 [2] 0.307901 +- 0.00222825
 Iteration 3 (pass 1):  10 regions
    1556 integrand evaluations so far,
    1016 in optimizing regions,
      84 in finding cuts
 [1] 0.664934 +- 0.00374206
+
 [2] 0.307901 +- 0.00217992
 Iteration 4 (pass 2):  11 regions
    1718 integrand evaluations so far,
    1126 in optimizing regions,
      88 in finding cuts
 [1] 0.664901 +- 0.00346076
+
 [2] 0.30789 +- 0.00199914
 Iteration 5 (pass 3):  12 regions
    1892 integrand evaluations so far,
    1242 in optimizing regions,
      98 in finding cuts
 [1] 0.664888 +- 0.00318212
+
 [2] 0.307893 +- 0.00191138
 Iteration 6 (pass 4):  13 regions
    2034 integrand evaluations so far,
    1326 in optimizing regions,
     108 in finding cuts
 [1] 0.66484 +- 0.00297658
+
 [2] 0.307884 +- 0.00179803
 Iteration 7 (pass 5):  14 regions
    2192 integrand evaluations so far,
    1426 in optimizing regions,
     118 in finding cuts
 [1] 0.664814 +- 0.00280222
+
 [2] 0.307882 +- 0.00173398
+
 Main integration on 14 regions with 269 samples per region.
 Region (0.718750) - (1.000000)
        (0.500000) - (1.000000)
@@ -502,6 +511,7 @@ Region (0.000000) - (0.437500)
     0.0136873 +- 1.77287e-05(0)  	chisq 0.000284013
 Totals:
 [1] 0.664635 +- 0.0004823  	chisq 0.0104742 (14 df)
+
 [2] 0.307817 +- 0.000298442  	chisq 0.00493667 (14 df)
 integral: 0.6646352 (+-0.00048)
 nregions: 14; integral: 0.3078175 (+-3e-04)
@@ -520,7 +530,6 @@ nregions: 14; number of evaluations:  4082; probability:  1.110223e-16 0.000000e
 +                   rel.tol=EPSREL, abs.tol=EPSABS,
 +                flags=list(pseudo.random=1, verbose=VERBOSE) ,
 +                 key1= KEY1)
-
 integral: 0.6646195 (+-0.00064)
 nregions: 14; number of evaluations:  3052; probability:  1.110223e-16 
 > 
@@ -530,7 +539,6 @@ nregions: 14; number of evaluations:  3052; probability:  1.110223e-16
 +                   rel.tol=EPSREL, abs.tol=EPSABS,
 +                flags=list(pseudo.random=1, verbose=VERBOSE) ,
 +                 key1= 447)
-
 integral: 0.6646681 (+-0.00013)
 nregions: 14; number of evaluations:  13416; probability:  0 
 > 
@@ -541,7 +549,6 @@ nregions: 14; number of evaluations:  13416; probability:  0
 +                   rel.tol=EPSREL, abs.tol=EPSABS,
 +                flags=list(pseudo.random=1, verbose=VERBOSE) ,
 +                 key1= -447)
-
 integral: 0.6648221 (+-0.00047)
 nregions: 24; number of evaluations:  34622; probability:  1 
 > 
@@ -552,7 +559,6 @@ nregions: 24; number of evaluations:  34622; probability:  1
 +                   rel.tol=EPSREL,  abs.tol=EPSABS,
 +                flags=list(pseudo.random=0, verbose=VERBOSE) ,
 +                 key1= -447)
-
 integral: 0.6646277 (+-0.00028)
 nregions: 14; number of evaluations:  19405; probability:  0.03333225 
 > 
@@ -563,7 +569,6 @@ nregions: 14; number of evaluations:  19405; probability:  0.03333225
 +                   rel.tol=EPSREL,  abs.tol=EPSABS,
 +                flags=list(pseudo.random=0, verbose=VERBOSE) ,
 +                 key1= 0)
-
 integral: 0.6646195 (+-0.00064)
 nregions: 14; number of evaluations:  3052; probability:  1.110223e-16 
 > cat(" KEY1=0,  pseudo.random=1\n")
@@ -572,7 +577,9 @@ nregions: 14; number of evaluations:  3052; probability:  1.110223e-16
 +                   rel.tol=EPSREL,  abs.tol=EPSABS,
 +                flags=list(pseudo.random=1, verbose=VERBOSE) ,
 +                 key1= 0)
-
 integral: 0.6646195 (+-0.00064)
 nregions: 14; number of evaluations:  3052; probability:  1.110223e-16 
 > 
+> proc.time()
+   user  system elapsed 
+  0.612   0.026   0.632 

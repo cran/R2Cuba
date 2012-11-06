@@ -1,4 +1,4 @@
-#dyn.load("../src/cuba.so");source("../R/suave.R"); source("../R/commoncuba.R")
+#dyn.load("../src/R2Cuba.so");source("../R/suave.R"); source("../R/commoncuba.R")
 library("R2Cuba")
 integrand <- function(arg, weight) {
   x <- arg[1]
