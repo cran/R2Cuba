@@ -1,3 +1,9 @@
+2013-03-08  Annie Bouvier
+
+	* DESCRIPTION: version is 1.0-9
+
+	* Remove a test which tests errors, and so is not accepted by R CMD check
+
 2012-11-06  Annie Bouvier
 
 	* DESCRIPTION: version is 1.0-8
