@@ -1,3 +1,9 @@
+2013-04-15   Annie Bouvier
+
+	* DESCRIPTION: version is 1.0-9
+
+	* common_stddecl.h: Replace memcpy by memove because memory areas may overlap.
+
 2013-03-08  Annie Bouvier
 
 	* DESCRIPTION: version is 1.0-9

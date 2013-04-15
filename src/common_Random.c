@@ -79,7 +79,7 @@ static inline void SobolIni(cnumber n, count ndim)
     int inibits = -1;
     for( j = powers; j; j >>= 1 ) ++inibits;
 
-    memcpy(pv, pini, inibits*sizeof(*pini));
+    memmove(pv, pini, inibits*sizeof(*pini));
     pini += 8;
 
     for( bit = inibits; bit < nbits; ++bit ) {

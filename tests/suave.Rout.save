@@ -1,5 +1,5 @@
 
-R version 2.15.0 (2012-03-30)
+R version 2.15.1 (2012-06-22) -- "Roasted Marshmallows"
 Copyright (C) 2012 The R Foundation for Statistical Computing
 ISBN 3-900051-07-0
 Platform: x86_64-unknown-linux-gnu (64-bit)
@@ -173,4 +173,4 @@ nregions: 6; number of evaluations:  6000; probability:  0.001946077
 > 
 > proc.time()
    user  system elapsed 
-  0.243   0.022   0.257 
+  0.262   0.016   0.271 

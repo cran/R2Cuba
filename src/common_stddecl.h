@@ -67,7 +67,7 @@
 
 #define Elements(x) (sizeof(x)/sizeof(*x))
 
-#define Copy(d, s, n) memcpy(d, s, (n)*sizeof(*(d)))
+#define Copy(d, s, n) memmove(d, s, (n)*sizeof(*(d)))
 
 #define VecCopy(d, s) Copy(d, s, ndim_)
 
