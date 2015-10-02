@@ -1,7 +1,6 @@
 
-R version 2.15.1 (2012-06-22) -- "Roasted Marshmallows"
-Copyright (C) 2012 The R Foundation for Statistical Computing
-ISBN 3-900051-07-0
+R version 3.1.1 (2014-07-10) -- "Sock it to Me"
+Copyright (C) 2014 The R Foundation for Statistical Computing
 Platform: x86_64-unknown-linux-gnu (64-bit)
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
@@ -582,4 +581,4 @@ nregions: 14; number of evaluations:  3052; probability:  1.110223e-16
 > 
 > proc.time()
    user  system elapsed 
-  0.654   0.027   0.675 
+  0.801   0.032   0.840 

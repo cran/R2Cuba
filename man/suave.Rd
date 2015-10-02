@@ -1,7 +1,7 @@
 \name{suave}
 \alias{suave}
 %- Also NEED an '\alias' for EACH other topic documented here.
-\title{  Multidimensional numerical integration with SUbregion-Adaptive Vegas algorithm }
+\title{  Integration with SUbregion-Adaptive Vegas Algorithm }
 \description{
   Suave uses \code{\link{vegas}}-like importance sampling combined
 with a globally adaptive subdivision strategy: Until the requested accuracy is reached,
@@ -55,7 +55,7 @@ to prevent overflow. More details about this parameter can be found
 Hahn's paper from 2005 and in Cuba documentation.}
 }
 \details{
-    See details in the documentation.dériv
+    See details in the documentation.
 }
 \value{
   Idem as \code{\link{cuhre}}

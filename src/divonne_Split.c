@@ -212,7 +212,8 @@ typedef const Errors cErrors;
     }
 
     delta[mincut->i] = mincut->save;
-    memmove(mincut, mincut + 1, (char *)&cut[ncut] - (char *)mincut);
+   memmove(mincut, mincut + 1, (char *)&cut[ncut] - (char *)mincut); 
+
   }
 
   for( icut = 0; icut < ncut; ++icut ) {

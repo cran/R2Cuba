@@ -1,5 +1,6 @@
 #include "suave_util.h"
 #include "suave_Fluct.h"
+#include "suave_decl.h"
 
 /*
 	Integrate.c
@@ -26,6 +27,7 @@ extern void decodflags(cint flags,
 		int *final,
 		int *verbose);
 
+ SUAVETYPEDEFREGION; 
 
 /* ****************************************************** */
  int suaveIntegrate(  ctreal epsrel, ctreal epsabs,
@@ -33,7 +35,6 @@ extern void decodflags(cint flags,
   cnumber nnew, ctreal flatness,
   real *integral, real *erreur, real *prob)
 {
-  SUAVETYPEDEFREGION;
 
   count dim, comp, df;
   int fail = 1;

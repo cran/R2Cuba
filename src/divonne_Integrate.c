@@ -11,6 +11,7 @@
 #include "common_ChiSquare.h"
 
 
+
 extern bool Explore(count iregion, cSamples *samples, cint depth, cint flags);
 extern void divonneRuleFree(Rule *rule);
 extern void IniRandom(cnumber n, cint flags, count ndim);
@@ -82,7 +83,7 @@ extern void decodflags(cint flags,
   }
 
   size_ = CHUNKSIZE;
-  MemAlloc(voidregion_, size_*sizeof(Region));
+ MemAlloc(voidregion_, size_*sizeof(Region));
   for( dim = 0; dim < ndim_; ++dim ) {
     Bounds *b = &region_->bounds[dim];
     b->lower = 0;

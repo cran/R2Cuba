@@ -6,6 +6,7 @@
 */
 
 #include "divonne_util.h"
+
 extern real divonneSample(ctreal *x0);
 
 #define EPS 0x1p-52 // pow(2, -52)

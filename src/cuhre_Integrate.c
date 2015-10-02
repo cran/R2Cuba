@@ -12,7 +12,8 @@
 #include "cuhre_decl.h"
 #include "cuhre_util.h"
 #include "cuhre_Rule.h"
-extern void cuhreSample(cRule *rule, void *voidregion, cint flags);
+extern void cuhreSample(cRule *rule, void *voidregion, cint flags,
+			SEXP rho, SEXP globf, Glob *globdim);
 extern void cuhreRuleFree(Rule *rule);
 
 extern void decodflags(cint flags, 
@@ -25,8 +26,11 @@ extern void decodflags(cint flags,
 /*********************************************************************/
  int cuhreIntegrate(  ctreal epsrel, ctreal epsabs,
   cint flags, number mineval, cnumber maxeval, ccount key,
-  real *integral, real *erreur, real *prob)
+  real *integral, real *erreur, real *prob,
+		      SEXP rho, SEXP globf, Glob *globdim)
 {
+
+/* rho, globf: La fonction R à intégrer et son environnement d'execution */		
 
 
   CUHRETYPEDEFREGION;
@@ -38,7 +42,7 @@ extern void decodflags(cint flags,
   count dim, comp, ncur, nregions, ipool, npool;
   int fail = 1;
   Rule rule;
-  Totals totals[NCOMP];
+  Totals totals[MAXNCOMP];
   Pool *cur = NULL, *pool;
   Region *region;
 
@@ -56,7 +60,7 @@ int smooth, pseudorandom, final, verbose;
       "  rel.tol " REEL "\n  abs.tol " REEL "\n"
       "  pseudo.random  %d\n  final %d\n  verbose %d\n  min.eval " NUMBER "\n  max.eval " NUMBER "\n"
       "  key " COUNT "\n",
-      ndim_, ncomp_,
+      globdim->ndim_, globdim->ncomp_,
       epsrel, epsabs,
       pseudorandom, final, verbose, mineval, maxeval,
       key);
@@ -67,36 +71,37 @@ int smooth, pseudorandom, final, verbose;
   if( setjmp(abort_) ) goto abort;
 #endif
 
-  if( key == 13 && ndim_ == 2 ) cuhreRule13Alloc(&rule);
-  else if( key == 11 && ndim_ == 3 ) cuhreRule11Alloc(&rule);
-  else if( key == 9 ) cuhreRule9Alloc(&rule);
-  else if( key == 7 ) cuhreRule7Alloc(&rule);
+  if( key == 13 && globdim->ndim_ == 2 ) cuhreRule13Alloc(&rule);
+  else if( key == 11 && globdim->ndim_ == 3 ) cuhreRule11Alloc(&rule);
+  else if( key == 9 ) cuhreRule9Alloc(&rule, globdim->ndim_);
+  else if( key == 7 ) cuhreRule7Alloc(&rule, globdim->ndim_);
   else {
-    if( ndim_ == 2 ) cuhreRule13Alloc(&rule);
-    else if( ndim_ == 3 ) cuhreRule11Alloc(&rule);
-    else cuhreRule9Alloc(&rule);
+    if( globdim->ndim_ == 2 ) cuhreRule13Alloc(&rule);
+    else if( globdim->ndim_ == 3 ) cuhreRule11Alloc(&rule);
+    else cuhreRule9Alloc(&rule, globdim->ndim_);
   }
-
-  Alloc(rule.x, rule.n*(ndim_ + ncomp_));
-  rule.f = rule.x + rule.n*ndim_;
+  Alloc(rule.x, rule.n*(globdim->ndim_ + globdim->ncomp_));
+  rule.f = rule.x + rule.n*globdim->ndim_;
 
   mineval = IMax(mineval, rule.n + 1);
 
-  Alloc(cur, 1);
+ Alloc(cur, 1);
   cur->next = NULL;
   ncur = 1;
 
   region = cur->region;
   region->div = 0;
-  for( dim = 0; dim < ndim_; ++dim ) {
+  for( dim = 0; dim < globdim->ndim_; ++dim ) {
     Bounds *b = &region->bounds[dim];
     b->lower = 0;
     b->upper = 1;
   }
 
-  cuhreSample(&rule, region, flags);
 
-  for( comp = 0; comp < ncomp_; ++comp ) {
+
+  cuhreSample(&rule, region, flags, rho, globf, globdim);
+
+  for( comp = 0; comp < globdim->ncomp_; ++comp ) {
     Totals *tot = &totals[comp];
     Result *r = &region->result[comp];
     tot->avg = tot->lastavg = tot->guess = r->avg;
@@ -109,30 +114,31 @@ int smooth, pseudorandom, final, verbose;
   for( nregions = 1; ; ++nregions ) {
     count maxcomp, bisectdim;
     real maxratio, maxerr;
-    Result result[NCOMP];
+    Result result[MAXNCOMP];
     Region *regionL, *regionR;
     Bounds *bL, *bR;
 
     if( VERBOSE ) {
-      char s[128 + 128*NCOMP], *p = s;
+      char s[128 + 128*MAXNCOMP], *p = s;
 
       p += sprintf(p, 
         "Iteration " COUNT ":  " NUMBER " integrand evaluations so far",
-        nregions, neval_);
+        nregions,  globdim->neval_);
 
-      for( comp = 0; comp < ncomp_; ++comp ) {
+      for( comp = 0; comp <  globdim->ncomp_; ++comp ) {
         cTotals *tot = &totals[comp];
         p += sprintf(p, "\n[" COUNT "] "
-          REEL " +- " REEL "  \tchisq " REEL " (" COUNT " df)\n",
+          REEL " +- " REEL "  \tchisq " REEL " (" COUNT " df)",
           comp + 1, tot->avg, tot->err, tot->chisq, nregions - 1);
       }
+      p += sprintf(p, "\n");
 
       Print(s);
     }
 
     maxratio = -INFTY;
     maxcomp = 0;
-    for( comp = 0; comp < ncomp_; ++comp ) {
+    for( comp = 0; comp <  globdim->ncomp_; ++comp ) {
       ctreal ratio = totals[comp].err/MaxErr(totals[comp].avg);
       if( ratio > maxratio ) {
         maxratio = ratio;
@@ -140,12 +146,12 @@ int smooth, pseudorandom, final, verbose;
       }
     }
 
-    if( maxratio <= 1 && neval_ >= mineval ) {
+    if( maxratio <= 1 &&  globdim->neval_ >= mineval ) {
       fail = 0;
       break;
     }
 
-    if( neval_ >= maxeval ) break;
+    if(  globdim->neval_ >= maxeval ) break;
 
     maxerr = -INFTY;
     regionL = cur->region;
@@ -169,18 +175,18 @@ int smooth, pseudorandom, final, verbose;
     regionR = &cur->region[ncur++];
 
     regionR->div = ++regionL->div;
-    ResCopy(result, regionL->result);
-    VecCopy(regionR->bounds, regionL->bounds);
+    Copy(result, regionL->result, globdim->ncomp_);
+    Copy(regionR->bounds, regionL->bounds, globdim->ndim_);
 
     bisectdim = result[maxcomp].bisectdim;
     bL = &regionL->bounds[bisectdim];
     bR = &regionR->bounds[bisectdim];
     bL->upper = bR->lower = .5*(bL->upper + bL->lower);
 
-    cuhreSample(&rule, regionL, flags);
-    cuhreSample(&rule, regionR, flags);
+    cuhreSample(&rule, regionL, flags, rho, globf, globdim);
+    cuhreSample(&rule, regionR, flags, rho, globf, globdim);
 
-    for( comp = 0; comp < ncomp_; ++comp ) {
+    for( comp = 0; comp < globdim->ncomp_; ++comp ) {
       cResult *r = &result[comp];
       Result *rL = &regionL->result[comp];
       Result *rR = &regionR->result[comp];
@@ -219,7 +225,7 @@ int smooth, pseudorandom, final, verbose;
     }
   }
 
-  for( comp = 0; comp < ncomp_; ++comp ) {
+  for( comp = 0; comp < globdim->ncomp_; ++comp ) {
     cTotals *tot = &totals[comp];
     integral[comp] = tot->avg;
     erreur[comp] = tot->err;
@@ -237,18 +243,18 @@ int smooth, pseudorandom, final, verbose;
         Region const *region = &pool->region[ipool];
         real lower[NDIM], upper[NDIM];
 
-        for( dim = 0; dim < ndim_; ++dim ) {
+        for( dim = 0; dim <globdim->ndim_; ++dim ) {
           cBounds *b = &region->bounds[dim];
           lower[dim] = b->lower;
           upper[dim] = b->upper;
         }
 
         MLPutFunction(stdlink, "Cuba`Cuhre`region", 3);
-        MLPutRealList(stdlink, lower, ndim_);
-        MLPutRealList(stdlink, upper, ndim_);
+        MLPutRealList(stdlink, lower, globdim->ndim_);
+        MLPutRealList(stdlink, upper, globdim->ndim_);
 
-        MLPutFunction(stdlink, "List", ncomp_);
-        for( comp = 0; comp < ncomp_; ++comp ) {
+        MLPutFunction(stdlink, "List", globdim->ncomp_);
+        for( comp = 0; comp < globdim->ncomp_; ++comp ) {
           cResult *r = &region->result[comp];
           real res[] = {r->avg, r->err};
           MLPutRealList(stdlink, res, Elements(res));
@@ -263,13 +269,14 @@ abort:
 
   while( (pool = cur) ) {
     cur = cur->next;
-    free(pool);
+     free(pool);
   }
 
-  free(rule.x);
+   free(rule.x); 
   cuhreRuleFree(&rule);
 
-  nregions_ = nregions;
+  globdim->nregions_ = nregions;
+
 
   return fail;
 }

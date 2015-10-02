@@ -1,7 +1,9 @@
 #include "inclR.h"
 #include "cuhre_decl.h"
 #include "cuhre_util.h"
-extern void cuhreDoSample(count n, ctreal *x,  real *f);
+
+extern void cuhreDoSample(count n, ctreal *x,  real *f,
+			  SEXP rho, SEXP globf, Glob *globdim);
 
 // Compilation note for R interface: move Rule.c into Rule.h
 /*
@@ -14,7 +16,7 @@ extern void cuhreDoSample(count n, ctreal *x,  real *f);
 */
 
 
-#define RESCALE(a, d) (a * (upper_[d] - lower_[d]) + lower_[d])
+#define RESCALE(a, d,  lower_, upper_) (a * (upper_[d] - lower_[d]) + lower_[d])
 
 
 /*********************************************************************/
@@ -27,7 +29,7 @@ extern void cuhreDoSample(count n, ctreal *x,  real *f);
 /*********************************************************************/
 /*********************************************************************/
 
- real *cuhreExpandFS(cBounds *b, real *g, real *x)
+real *cuhreExpandFS(cBounds *b, real *g, real *x, count ndim_ )
 {
   count dim, ndim = ndim_;
 
@@ -76,10 +78,15 @@ next:
 /*********************************************************************/
 
 
- void cuhreSample(cRule *rule, void *voidregion, cint flags)
+ void cuhreSample(cRule *rule, void *voidregion, cint flags,
+		  SEXP rho, SEXP globf, Glob *globdim)
 {
+
+/* rho, globf: La fonction R à intégrer et son environnement d'execution */		
   CUHRETYPEDEFREGION;
   CUHRETYPEDEFSET;
+  count ndim_ = globdim->ndim_;
+  count ncomp_  = globdim->ncomp_;
 
   Region *const region = (Region *)voidregion;
   ctreal vol = ldexp(1., -region->div);
@@ -102,11 +109,13 @@ next:
     }
   }
 
+
+ 
   for( s = first; s <= last; ++s )
-    if( s->n ) x = cuhreExpandFS(region->bounds, s->gen, x);
+    if( s->n ) x = cuhreExpandFS(region->bounds, s->gen, x, ndim_);
 
 
-  cuhreDoSample(rule->n, rule->x, f);
+  cuhreDoSample(rule->n, rule->x, f, rho, globf, globdim);
 
   for( comp = 0; comp < ncomp_; ++comp ) {
     Result *r = &region->result[comp];
@@ -168,7 +177,7 @@ next:
       p += sprintf(p,
         (dim == 0) ? "Region (" REALF ") - (" REALF ")" :
                      "\n       (" REALF ") - (" REALF ")",
-		   RESCALE(b->lower,dim),  RESCALE(b->upper,dim));
+		   RESCALE(b->lower,dim, globdim->lower_, globdim->upper_),  RESCALE(b->upper,dim, globdim->lower_, globdim->upper_));
     }
 
     for( comp = 0; comp < ncomp_; ++comp ) {

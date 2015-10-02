@@ -4,6 +4,7 @@
 #include "divonne_decl.h"
 #include "divonne_util.h"
 
+
 /*********************************************************************/
 enum { nrules = 5 };
 
@@ -57,7 +58,7 @@ static void divonneRule13Alloc(Rule *rule)
   count n, r;
   Set *first, *last, *s, *t;
 
-  Alloc(first, nsets);
+   Alloc(first,  nsets);
   Clear(first, nsets);
 
   last = first;
@@ -205,7 +206,7 @@ static void divonneRule11Alloc(Rule *rule)
   count n, r;
   Set *first, *last, *s, *t;
 
-  Alloc(first, nsets);
+   Alloc(first,  nsets);
   Clear(first, nsets);
 
   last = first;
@@ -344,7 +345,7 @@ static void divonneRule9Alloc(Rule *rule)
   count dim, n, r;
   Set *first, *last, *s, *t;
 
-  Alloc(first, nsets);
+   Alloc(first,  nsets);
   Clear(first, nsets);
 
   last = first;
@@ -477,7 +478,7 @@ static void divonneRule7Alloc(Rule *rule)
   count dim, n, r;
   Set *first, *last, *s, *t;
 
-  Alloc(first, nsets);
+   Alloc(first,  nsets);
   Clear(first, nsets);
 
   last = first;

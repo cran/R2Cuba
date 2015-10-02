@@ -1,7 +1,6 @@
 
-R version 2.15.1 (2012-06-22) -- "Roasted Marshmallows"
-Copyright (C) 2012 The R Foundation for Statistical Computing
-ISBN 3-900051-07-0
+R version 3.2.0 (2015-04-16) -- "Full of Ingredients"
+Copyright (C) 2015 The R Foundation for Statistical Computing
 Platform: x86_64-unknown-linux-gnu (64-bit)
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
@@ -34,16 +33,14 @@ Type 'q()' to quit R.
 > NCOMP <- 1
 > EPSREL <- 1e-3
 > EPSABS <- 1e-12
-> VERBOSE <-  2
-> LAST <- 1
 > 
 > 
->  cuhre(NDIM, NCOMP,  integrand,  flags= list(verbose=VERBOSE))
+>  cuhre(NDIM, NCOMP,  integrand, rel.tol=EPSREL, abs.tol=EPSABS, flags= list(verbose=2))
 Cuhre input parameters:
   ndim 3
   ncomp 1
   rel.tol 0.001
-  abs.tol 4.93038e-32
+  abs.tol 1e-12
   pseudo.random  0
   final 0
   verbose 2
@@ -56,7 +53,7 @@ Iteration 2:  381 integrand evaluations so far
 [1] 0.66467 +- 3.33018e-11  	chisq 0 (1 df)
 integral: 0.6646697 (+-3.3e-11)
 nregions: 2; number of evaluations:  381; probability:  0 
->  cuhre(NDIM, NCOMP,  integrand,  flags= list(pseudo.random=1))
+>  cuhre(NDIM, NCOMP,  integrand,  rel.tol=EPSREL, abs.tol=EPSABS, flags= list(pseudo.random=1))
 Iteration 1:  127 integrand evaluations so far
 [1] 0.66467 +- 7.2682e-10  	chisq 0 (0 df)
 Iteration 2:  381 integrand evaluations so far
@@ -72,7 +69,7 @@ nregions: 2; number of evaluations:  381; probability:  0
 +   ff <- sin(x-3)*cos(y-2)*exp(z-1);
 + return(ff)
 + } # End integrand2
->  cuhre(NDIM, NCOMP,  integrand2, lower=c(3,2,1), upper=c(4,3,2), flags=list(verbose=3))
+>  cuhre(NDIM, NCOMP,  integrand2, lower=c(3,2,1), upper=c(4,3,2), flags=list(verbose=3, rel.tol=EPSREL, abs.tol=EPSABS))
 Cuhre input parameters:
   ndim 3
   ncomp 1
@@ -106,4 +103,4 @@ nregions: 2; number of evaluations:  381; probability:  0
 > 
 > proc.time()
    user  system elapsed 
-  0.162   0.018   0.173 
+  0.277   0.091   0.357 

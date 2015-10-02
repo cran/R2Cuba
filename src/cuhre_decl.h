@@ -10,7 +10,6 @@
 
 #include "common_stddecl.h"
 
-
 typedef struct {
   real avg, err;
   count bisectdim;
@@ -43,6 +42,7 @@ typedef struct {
 } Rule;
 
 typedef const Rule cRule;
+typedef void (*Integrand)(ccount *, ctreal *, ccount *, ctreal *lower, ctreal *upper, ctreal prdbounds, real *, SEXP rho, SEXP globf, SEXP globdim);
 
 
 #define CUHRETYPEDEFREGION \
@@ -50,9 +50,8 @@ typedef const Rule cRule;
     count div; \
     Result result[MAXNCOMP]; \
     Bounds bounds[MAXNDIM]; \
-  } Region
+  } Region;
 
 
-typedef void (*Integrand)(ccount *, ctreal *, ccount *, ctreal *lower, ctreal *upper, ctreal prdbounds, real *);
 
 #endif

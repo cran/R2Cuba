@@ -15,7 +15,7 @@
 #if NDIM > 0
   if( ndim > NDIM ) return true;
 #endif
-return ndim < 2;
+return ndim < 1;
 }
 
 

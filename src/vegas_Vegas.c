@@ -69,7 +69,8 @@ PROTECT(argw=allocVector(REALSXP, (1 )));
  PROTECT(resultsxp=eval(s,rho));
  UNPROTECT(5);
 if  (length(resultsxp) != *ncomp)
-   error("Function integrand does not return a vector of length ncomp");
+  error("Function integrand does not return a vector of length ncomp\n Length of returned vector= %d. ncomp=%d\n",
+	length(resultsxp), *ncomp);
 
  for (i =0; i<*ncomp;  i++) {
    ff[i] = REAL(resultsxp)[i] * prdbounds;

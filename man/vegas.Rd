@@ -1,7 +1,7 @@
 \name{vegas}
 \alias{vegas}
 %- Also NEED an '\alias' for EACH other topic documented here.
-\title{ Multidimensional numerical integration with a Monte Carlo algorithm}
+\title{ Integration with a Monte Carlo Algorithm}
 \description{
   Implement a  Monte Carlo  algorithm for multidimensional numerical
   integration.     This algorithm  uses importance sampling as a variance-reduction

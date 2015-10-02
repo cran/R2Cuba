@@ -7,6 +7,7 @@
 
 #include "vegas_decl.h"
 #include "vegas_util.h"
+
 extern int EXPORT(vegasgridno);
 
  void GetGrid(Grid *grid)
@@ -43,7 +44,7 @@ extern int EXPORT(vegasgridno);
 
 
   if( slot < MAXGRIDS ) {
-    if( gridptr_[slot] == NULL ) Alloc(gridptr_[slot], ndim_);
+    if( gridptr_[slot] == NULL )  Alloc(gridptr_[slot], ndim_);
     griddim_[slot] = ndim_;
     VecCopy(gridptr_[slot], grid);
 

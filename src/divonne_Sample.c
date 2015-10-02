@@ -203,7 +203,7 @@ extern void GetRandom(real *x, count ndim);
   nx = ndim_*(samples->n + 1);		/* need 1 for extrapolation */
   nf = ncomp_*(samples->n + 1);
 
-  Alloc(samples->x, nx + nf + ncomp_ + ncomp_);
+  Alloc(samples->x,  nx + nf + ncomp_ + ncomp_);
   samples->f = samples->x + nx;
   samples->avg = samples->f + nf;
   samples->err = samples->avg + ncomp_;

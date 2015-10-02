@@ -1,0 +1,29 @@
+=== R2Cuba : Multidimensional Numerical Integration ===
+
+2015-10-01 version 1.1-0
+
+	   * With cuhre, the integrand can call itself cuhre 
+
+2015-01-26 version 1.0-13
+
+	* cuhre_common.c: Dimension equal to 1 now accepted
+	(previoulsy, should be greater than 1)
+
+	* commoncuba.R: Fix a minor bug in an error message
+
+2014-12-01 version 1.0-12
+
+	* NAMESPACE: Package 'methods' imported
+
+2013-04-15   version is 1.0-9
+	
+	* common_stddecl.h: Replace memcpy by memmove because memory areas may overlap.
+	
+	* Remove a test which tests errors, and so is not accepted by R CMD check
+
+2012-11-06  version is 1.0-8
+
+	* Remove printing of a new line after each result display
+
+	* vegas_Vegas.c: Fix a bug in the affectation of vegasstate
+

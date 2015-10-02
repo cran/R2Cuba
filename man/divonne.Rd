@@ -1,7 +1,7 @@
 \name{divonne}
 \alias{divonne}
 %- Also NEED an '\alias' for EACH other topic documented here.
-\title{  Multidimensional numerical integration by stratified sampling for variance reduction}
+\title{  Integration by Stratified Sampling for Variance Reduction}
 \description{
   Divonne works by stratified sampling, where the partioning of the
 integration

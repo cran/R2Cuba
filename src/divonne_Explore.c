@@ -7,6 +7,7 @@
 
 #include "divonne_decl.h"
 #include "divonne_util.h"
+
 extern void Split(count iregion, int depth);
 extern real FindMinimum(cBounds *b, real *xmin, real fminiii);
 extern count SampleExtra( cBounds *b);
@@ -42,7 +43,7 @@ typedef struct {
   if( SPLICE ) {
     if( nregions_ == size_ ) {
       size_ += CHUNKSIZE;
-      ReAlloc(voidregion_, size_*sizeof(Region));
+     ReAlloc(voidregion_, size_*sizeof(Region));
     }
     VecCopy(region_[nregions_].bounds, region_[iregion].bounds);
     iregion = nregions_++;

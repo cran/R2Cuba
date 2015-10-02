@@ -16,12 +16,10 @@ NDIM <- 3
 NCOMP <- 1
 EPSREL <- 1e-3
 EPSABS <- 1e-12
-VERBOSE <-  2
-LAST <- 1
 
 
- cuhre(NDIM, NCOMP,  integrand,  flags= list(verbose=VERBOSE))
- cuhre(NDIM, NCOMP,  integrand,  flags= list(pseudo.random=1))
+ cuhre(NDIM, NCOMP,  integrand, rel.tol=EPSREL, abs.tol=EPSABS, flags= list(verbose=2))
+ cuhre(NDIM, NCOMP,  integrand,  rel.tol=EPSREL, abs.tol=EPSABS, flags= list(pseudo.random=1))
 
 # Essai en déplacant les bornes
 integrand2 <- function(arg) {
@@ -31,5 +29,5 @@ integrand2 <- function(arg) {
   ff <- sin(x-3)*cos(y-2)*exp(z-1);
 return(ff)
 } # End integrand2
- cuhre(NDIM, NCOMP,  integrand2, lower=c(3,2,1), upper=c(4,3,2), flags=list(verbose=3))
+ cuhre(NDIM, NCOMP,  integrand2, lower=c(3,2,1), upper=c(4,3,2), flags=list(verbose=3, rel.tol=EPSREL, abs.tol=EPSABS))
 

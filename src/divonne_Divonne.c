@@ -68,7 +68,9 @@ PROTECT(t = s = allocList(3));
 
  if (verif_== true) {
  if  (length(resultsxp) != *ncomp)
-   error("Function integrand does not return a vector of length ncomp");
+ error("Function integrand does not return a vector of length ncomp\n Length of returned vector= %d. ncomp=%d\n",
+	length(resultsxp), *ncomp);
+
  verif_= false; // do not verify the next time
  }
 
@@ -215,14 +217,14 @@ PROTECT(dimnames = allocVector(VECSXP, 2));
       cnumber nfgiven = ngiven*ncomp;
       cnumber nfextra = nextra*ncomp;
 
-      Alloc(xgiven_, nxgiven + nxextra + nfgiven + nfextra);
+      Alloc( xgiven_, nxgiven + nxextra + nfgiven + nfextra);
       xextra_ = xgiven_ + nxgiven;
       fgiven_ = xextra_ + nxextra;
       fextra_ = fgiven_ + nfgiven;
 
       if( nxgiven ) {
         phase_ = 0;
-        Copy(xgiven_, xgiven, nxgiven);
+	Copy(xgiven_, xgiven, nxgiven);
         divonneDoSample(ngiven_, ldxgiven_, xgiven_, fgiven_);
       }
     }
@@ -294,7 +296,7 @@ double *pmaxchisq, double *pmindeviation,
   prdbounds_ = *prdbounds;
 
    if (NA_INTEGER != *pmersenneseed) 
-    SUFFIX(mersenneseed)= *pmersenneseed;
+     SUFFIX(mersenneseed)= *pmersenneseed;
 
     verif_= true;
 

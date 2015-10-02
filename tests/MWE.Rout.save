@@ -1,0 +1,90 @@
+
+R version 3.2.0 (2015-04-16) -- "Full of Ingredients"
+Copyright (C) 2015 The R Foundation for Statistical Computing
+Platform: x86_64-unknown-linux-gnu (64-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+> # Example 2015/09/03
+> # Pierre de Villemereuil : pierre.de.villemereuil@mailoo.org
+> # Call of "cuhre".
+> # The integrand calls itself "cuhre"
+> # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+> 
+> 
+> library(R2Cuba)
+> library(mvtnorm)
+> 
+> #Minimal working example
+> mu=c(0,10)			#Mean
+> G=matrix(c(0.5,0,0,1),nrow=2)	#Some variance-covariance matrix
+> P=matrix(c(1,0,0,2),nrow=2) 	#Some other VCV matrix
+> 
+> #Arbitrary function yielding a scalar
+> arb.func<-function(x){x[1]+0.5*x[2]}
+> rel.tol<-10; abs.tol<-10# Not so good, for timing purpose
+> 
+> 
+> #We want to compute the covariance between a vector v and an arbitrary function of another vector which depends on v
+> #A way to do that is first to compute the expectency of the function given a value of the vector v
+> exp_func_v<-function(v){cuhre(ndim=2,ncomp=1,integrand=function(x){arb.func(x)*dmvnorm(x,mu+v,P)},lower=-c(100,1000),upper=c(100,1000),
++ rel.tol=rel.tol, abs.tol=abs.tol,
++ flags=list(verbose=0))$value}
+> #exp_func_v works and indeed yields a scalar
+> exp_func_v(c(10,0))
+[1] 6.413861e-22
+> 
+> #Then we average the expectancy above over all values of v
+> a<-cuhre(ndim=2,ncomp=2,integrand=function(v){v*exp_func_v(v)*dmvnorm(v,c(0,0),G)}, lower=-c(100,1000),upper=c(100,1000),
++ rel.tol=rel.tol, abs.tol=abs.tol,
++ flags=list(verbose=3))
+Cuhre input parameters:
+  ndim 2
+  ncomp 2
+  rel.tol 10
+  abs.tol 10
+  pseudo.random  0
+  final 0
+  verbose 3
+  min.eval 0
+  max.eval 50000
+  key 0
+Region (-100.000000) - (100.000000)
+       (-1000.000000) - (1000.000000)
+[1] 1.42083e-278 +- 3.25674e-277
+
+[2] 0 +- 0
+Iteration 1:  65 integrand evaluations so far
+[1] 1.42083e-278 +- 3.25674e-277  	chisq 0 (0 df)
+[2] 0 +- 0  	chisq 0 (0 df)
+Region (-100.000000) - (0.000000)
+       (-1000.000000) - (1000.000000)
+[1] 3.42534e-24 +- 8.58915e-23
+
+[2] 0 +- 0
+Region (0.000000) - (100.000000)
+       (-1000.000000) - (1000.000000)
+[1] 3.42534e-24 +- 8.58915e-23
+
+[2] 0 +- 0
+Iteration 2:  195 integrand evaluations so far
+[1] 3.42534e-24 +- 1.57009e-16  	chisq 4.75944e-16 (1 df)
+[2] 0 +- 1.57009e-16  	chisq 0 (1 df)
+> print(a$value)
+[1] 3.425336e-24 0.000000e+00
+> 
+> 
+> proc.time()
+   user  system elapsed 
+  7.347   0.160   7.495 

@@ -4,7 +4,6 @@
 		last modified 29 May 09 th
 */
 
-
 #ifndef __stddecl_h__
 #define __stddecl_h__
 
@@ -67,40 +66,11 @@
 
 #define Elements(x) (sizeof(x)/sizeof(*x))
 
-#define Copy(d, s, n) memmove(d, s, (n)*sizeof(*(d)))
 
-#define VecCopy(d, s) Copy(d, s, ndim_)
-
-#define ResCopy(d, s) Copy(d, s, ncomp_)
-
-#define Clear(d, n) memset(d, 0, (n)*sizeof(*(d)))
-
-#define VecClear(d) Clear(d, ndim_)
-
-#define ResClear(d) Clear(d, ncomp_)
-
-#define Zap(d) memset(d, 0, sizeof(d))
 
 #define MaxErr(avg) Max(epsrel*fabs(avg), epsabs)
 
-#ifdef __cplusplus
-#define mallocset(p, n) (*(void **)&p = malloc(n))
-#define reallocset(p, n) (*(void **)&p = realloc(p, n))
-#else
-#define mallocset(p, n) (p = malloc(n))
-#define reallocset(p, n) (p = realloc(p, n))
-#endif
-/* Compilation note for R interface: 
-we cannot use the R function "error" because
-of names conflict with a variable of same name in the files
-which include this file */
-#define ChkAlloc(r) if( r == NULL ) { \
-     error( "Out of memory in " __FILE__ " line %d.\n", __LINE__); \
-}
 
-#define Alloc(p, n) MemAlloc(p, (n)*sizeof(*p))
-#define MemAlloc(p, n) ChkAlloc(mallocset(p, n))
-#define ReAlloc(p, n) ChkAlloc(reallocset(p, n))
 
 
 #ifdef __cplusplus
@@ -109,6 +79,7 @@ which include this file */
 #define Extern extern
 typedef enum { false, true } bool;
 #endif
+
 
 typedef const bool cbool;
 
@@ -202,5 +173,34 @@ static inline real Weight(ctreal sum, ctreal sqsum, cnumber n)
 /* abs(a) + (a == 0) */
 #define Abs1(a) (((a) ^ NegQ(a)) - NegQ((a) - 1))
 
+
+/* Allocation macros */
+#define Copy(d, s, n) memmove(d, s, (n)*sizeof(*(d)))
+#define VecCopy(d, s) Copy(d, s, ndim_)
+
+#define ResCopy(d, s) Copy(d, s, ncomp_)
+
+#define Clear(d, n) memset(d, 0, (n)*sizeof(*(d)))
+#define VecClear(d) Clear(d, ndim_)
+
+#define ResClear(d) Clear(d, ncomp_)
+
+#define Zap(d) memset(d, 0, sizeof(d))
+#ifdef __cplusplus 
+#define mallocset(p, n) (*(void **)&p = malloc(n))
+#define reallocset(p, n) (*(void **)&p = realloc(p, n))
+#else
+#define mallocset(p, n) (p = malloc( (size_t)n))
+#define reallocset(p, n) (p = realloc(p, n))
+#endif
+
+#define ChkAlloc(r) if( (void *)r == NULL ) {			   \
+     error( "Out of memory in " __FILE__ " line %d.\n", __LINE__); \
+}
+
+#define MemAlloc(p, n) ChkAlloc(mallocset(p, n))
+
+#define Alloc(p, n) MemAlloc(p, (n)*sizeof(*p))
+#define ReAlloc(p, n) ChkAlloc(reallocset(p, n))
 
 #endif

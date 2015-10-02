@@ -1,4 +1,3 @@
-# Les points d'entree C ou Fortran appelés par les fonctions R;
 useDynLib(R2Cuba, Rcuhre, Rdivonne, Rsuave, Rvegas)
-# Les fonctions R a disposition de l'utilisateur
-export(cuhre, divonne, suave, vegas, print.cuba)
+export(cuhre, divonne, suave, vegas)
+S3method(print, cuba)

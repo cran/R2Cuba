@@ -1,3 +1,29 @@
+###################################################################
+# R2Cuba R package
+# Copyright INRA 2015
+# INRA, UR1404, Research Unit MaIAGE
+# F78352 Jouy-en-Josas, France.
+#
+# This file is part of R2Cuba R package, interface between R and
+# the Cuba library.
+# R2Cuba URL: http://cran.r-project.org/web/packages/R2Cuba
+# Cuba library URL: http://www.feynarts.de/cuba
+
+# R2Cuba is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# See the GNU General Public License at:
+# http://www.gnu.org/licenses/
+#
+###################################################################
+
 # -------------------------------------------------------
 
 cuhre <- function(ndim, ncomp,
@@ -13,7 +39,8 @@ cuhre <- function(ndim, ncomp,
                     
   {
 
-     # Verification
+
+ # Verification
  if (!verif(ndim, ncomp, lower, upper, rel.tol, abs.tol,
             flags, min.eval,  max.eval))
       stop("Error in input: see the warnings")
@@ -32,13 +59,14 @@ cuhre <- function(ndim, ncomp,
 
 # Determine how to call the user function according to
   # the list of its arguments and the current list of arguments
- libargs <- c("ndim", "ncomp", 
+libargs <- c("ndim", "ncomp", 
                  "integrand","lower", "upper",
                   "rel.tol", "abs.tol", "flags",
                   "min.eval","max.eval", "key")
  ffintegrand <- crff(match.call(), integrand, "cuhre", libargs, ...)
 
   prdbounds <- prod(upper-lower)
+ 
     ret <-  .C("Rcuhre", as.integer(ndim),
              as.integer(ncomp),
              ffintegrand, new.env(),
@@ -53,13 +81,14 @@ cuhre <- function(ndim, ncomp,
              integral=as.double(integral),
              error=as.double(error), prob=as.double(prob),
                NAOK=TRUE)
+
 #Add to finish the last print:cat("\n") AB remove : 5/11/12
 
 # To homogeneize with the R function "integrate", add
     # message and call into the output,
     # ifail rather than fail , abs.error rather than  error,
     # value rather than integral
-    
+
     
     if (ret$fail ==0)
       mess ="OK" # OK required to be printed by print.cuba
@@ -74,7 +103,8 @@ cuhre <- function(ndim, ncomp,
                    prob=ret$prob, message=mess,
                 call=match.call())
     attr(retour, "class") = c("cuba")
-    return(retour)
+
+return(retour)
   } # End cuhre
 
                 

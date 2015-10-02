@@ -15,9 +15,6 @@
   number neval_;
   Integrand integrand_;
 
-
-
-
 #define RegionAlloc(p, n, nnew) \
   MemAlloc(p, sizeof(Region) + \
               (n)*(ndim_ + ncomp_ + 1)*sizeof(real) + \

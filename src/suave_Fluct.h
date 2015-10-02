@@ -1,6 +1,7 @@
 #ifndef __suave_fluct_h__
 #define __suave_fluct_h__
 #include "suave_util.h"
+
 /*
 	Fluct.c
 		compute the fluctuation in the left and right half

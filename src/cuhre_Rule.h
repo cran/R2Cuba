@@ -67,7 +67,7 @@ static void cuhreRule13Alloc(Rule *rule)
   count n, r;
   Set *first, *last, *s, *t;
 
-  Alloc(first, nsets);
+    Alloc(first, nsets); 
   Clear(first, nsets);
 
   last = first;
@@ -215,16 +215,18 @@ static void cuhreRule11Alloc(Rule *rule)
   count n, r;
   Set *first, *last, *s, *t;
 
-  Alloc(first, nsets);
-  Clear(first, nsets);
+   Alloc(first,  nsets);
+   Clear(first, nsets);
 
   last = first;
   n = last->n = 1;
+
   Copy(last->weight, w[0], nrules);
 
   ++last;
   n += last->n = 2*ndim;
   Copy(last->weight, w[1], nrules);
+
   last->gen[0] = g[0];
 
   ++last;
@@ -315,7 +317,7 @@ static void cuhreRule11Alloc(Rule *rule)
 
 /*********************************************************************/
 
-static void cuhreRule9Alloc(Rule *rule)
+static void cuhreRule9Alloc(Rule *rule, count ndim_)
 {
   static ctreal w[] = {
     -.0023611709677855117884,   .11415390023857325268,
@@ -354,8 +356,8 @@ static void cuhreRule9Alloc(Rule *rule)
   count dim, n, r;
   Set *first, *last, *s, *t;
 
-  Alloc(first, nsets);
-  Clear(first, nsets);
+   Alloc(first,  nsets);
+   Clear(first, nsets);
 
   last = first;
   n = last->n = 1;
@@ -459,7 +461,7 @@ static void cuhreRule9Alloc(Rule *rule)
 
 /*********************************************************************/
 
-static void cuhreRule7Alloc(Rule *rule)
+static void cuhreRule7Alloc(Rule *rule, count ndim_)
 {
   static ctreal w[] = {
      .019417866674748388428,   -.40385257701150182546,
@@ -487,8 +489,8 @@ static void cuhreRule7Alloc(Rule *rule)
   count dim, n, r;
   Set *first, *last, *s, *t;
 
-  Alloc(first, nsets);
-  Clear(first, nsets);
+   Alloc(first, nsets);
+ Clear(first, nsets); 
 
   last = first;
   n = last->n = 1;

@@ -1,3 +1,29 @@
+###################################################################
+# R2Cuba R package
+# Copyright INRA 2015
+# INRA, UR1404, Research Unit MaIAGE
+# F78352 Jouy-en-Josas, France.
+#
+# This file is part of R2Cuba R package, interface between R and
+# the Cuba library.
+# R2Cuba URL: http://cran.r-project.org/web/packages/R2Cuba
+# Cuba library URL: http://www.feynarts.de/cuba
+
+# R2Cuba is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# See the GNU General Public License at:
+# http://www.gnu.org/licenses/
+#
+###################################################################
+
 # -------------------------------------------  
 verifvegas <- function( nstart, nincrease, nbatch,gridno, state.file ) {
   # Verification
@@ -113,7 +139,7 @@ if (is.null(state.file))
     
     
     if (ret$fail ==0)
-      mess ="OK" # libellé obligatoire pour l'ip par print.cuba
+      mess ="OK" # compulsory for the printing by print.cuba
     else
       mess="Dimension out of range"
 

@@ -1,8 +1,7 @@
 \name{cuhre}
 \alias{cuhre}
 %- Also NEED an '\alias' for EACH other topic documented here.
-\title{Multidimensional numerical integration with a deterministic
-  iterative adaptive algorithm}
+\title{Integration by a Deterministic Iterative Adaptive Algorithm}
 \description{
   Implement a  deterministic algorithm for multidimensional numerical
   integration. Its algorithm uses one of several cubature rules in a
@@ -48,7 +47,8 @@ cuhre(ndim, ncomp, integrand, ...,
   Vector of length \code{ndim}}
   \item{rel.tol}{ the requested relative accuracy. Default, 0.001.}
   \item{abs.tol}{ the requested absolute accuracy. The algorithm stops
-    when either the relative or the absolute accuracies are met. Default
+    when either the relative or the absolute accuracies are
+    met. Default, near
   0 (the algorithm stops when the relative accuracy is met).}
   \item{flags}{flags governing the integration. A list
     with components:

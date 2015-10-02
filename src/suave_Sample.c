@@ -9,6 +9,7 @@
 
 #include "suave_decl.h"
 #include "suave_util.h"
+
 extern void GetRandom(real *x, count ndim);
 extern void suaveDoSample(number n, ctreal *w, ctreal *x, real *f);
 
@@ -67,7 +68,7 @@ typedef struct {
 
   if( VERBOSE > 2 ) {
     char *p0;
-    MemAlloc(ss, ndim_*64 + ncomp_*(sizeof(char *) + chars));
+     MemAlloc(ss,  ndim_*64 + ncomp_*(sizeof(char *) + chars));
     s = (char *)(ss + ncomp_);
     p0 = s + ndim_*64;
     for( comp = 0; comp < ncomp_; ++comp ) {
